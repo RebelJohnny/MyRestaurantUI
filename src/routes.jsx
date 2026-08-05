@@ -24,12 +24,14 @@
 
 // Material Dashboard 2 React layouts
 import Dashboard from "@/pages/dashboard";
-import RTL from "@/pages/rtl";
 import SignIn from "@/pages/authentication/sign-in";
 import SignUp from "@/pages/authentication/sign-up";
 
 // @mui icons
 import Icon from "@mui/material/Icon";
+import Personnel from "@/pages/personnel";
+import MealPeriod from "@/pages/mealPeriod";
+import MenuItem from "@/pages/menuItem";
 
 const routes = [
   {
@@ -42,28 +44,44 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "RTL",
-    key: "rtl",
+    name: "پرسنل",
+    key: "personnel",
     icon: <Icon fontSize="small">format_textdirection_r_to_l</Icon>,
-    route: "/rtl",
-    component: <RTL />,
+    route: "/personnel",
+    component: <Personnel />,
   },
   {
     type: "collapse",
-    name: "Sign In",
-    key: "sign-in",
-    icon: <Icon fontSize="small">login</Icon>,
-    route: "/authentication/sign-in",
-    component: <SignIn />,
+    name: "وعده غذایی",
+    key: "mealPeriod",
+    icon: <Icon fontSize="small">format_textdirection_r_to_l</Icon>,
+    route: "/mealPeriod",
+    component: <MealPeriod />,
   },
   {
     type: "collapse",
-    name: "Sign Up",
-    key: "sign-up",
-    icon: <Icon fontSize="small">assignment</Icon>,
-    route: "/authentication/sign-up",
-    component: <SignUp />,
+    name: "غذا",
+    key: "menuItem",
+    icon: <Icon fontSize="small">format_textdirection_r_to_l</Icon>,
+    route: "/menuItem",
+    component: <MenuItem />,
   },
+  // {
+  //   type: "collapse",
+  //   name: "Sign In",
+  //   key: "sign-in",
+  //   icon: <Icon fontSize="small">login</Icon>,
+  //   route: "/authentication/sign-in",
+  //   component: <SignIn />,
+  // },
+  // {
+  //   type: "collapse",
+  //   name: "Sign Up",
+  //   key: "sign-up",
+  //   icon: <Icon fontSize="small">assignment</Icon>,
+  //   route: "/authentication/sign-up",
+  //   component: <SignUp />,
+  // },
 ];
 
 export default routes;
