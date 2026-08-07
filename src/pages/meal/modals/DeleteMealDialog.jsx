@@ -1,14 +1,14 @@
-import { useDeleteMenuItemMutation } from "@/features/api/menuItemApis";
+import { useDeleteMealMutation } from "@/features/api/mealApis";
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 
-export default function DeleteMenuItemDialog({ id, open, onClose }) {
+export default function DeleteMealDialog({ id, open, onClose }) {
     /* -------------------------------------------------------------------------- */
     /*                              Redux / RTKQuery                              */
     /* -------------------------------------------------------------------------- */
     /* -------------------------------- Mutations ------------------------------- */
-    const [deleteMenuItem, deleteResults] = useDeleteMenuItemMutation();
+    const [deleteMeal, deleteResults] = useDeleteMealMutation();
     const handleDelete = async () => {
-        await deleteMenuItem(id).unwrap().then(onClose).catch((error) => console.error(error))
+        await deleteMeal(id).unwrap().then(onClose).catch((error) => console.error(error))
     }
     /* -------------------------------------------------------------------------- */
     return (

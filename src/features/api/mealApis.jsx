@@ -1,9 +1,9 @@
 import { providesListTag } from "../providesListTag";
 import { restaurantSlice } from "../restaurantSlice";
 
-const menuItemApis = restaurantSlice.injectEndpoints({
+const mealApis = restaurantSlice.injectEndpoints({
     endpoints: (builder) => ({
-        createMenuItem: builder.mutation({
+        createMeal: builder.mutation({
             query: ({ args }) => ({
                 url: `MenuItem`,
                 method: 'POST',
@@ -13,7 +13,7 @@ const menuItemApis = restaurantSlice.injectEndpoints({
             transformErrorResponse: (response) => response.data.problem,
             invalidatesTags: [{ type: 'MenuItem', id: 'LIST' }]
         }),
-        getMenuItems: builder.query({
+        getMeals: builder.query({
             query: () => ({
                 url: `MenuItem`,
             }),
@@ -21,7 +21,7 @@ const menuItemApis = restaurantSlice.injectEndpoints({
             transformErrorResponse: (response) => response.data.problem,
             providesTags: (result) => providesListTag(result, 'MenuItem')
         }),
-        updateMenuItem: builder.mutation({
+        updateMeal: builder.mutation({
             query: ({ id, args }) => ({
                 url: `MenuItem/${id}`,
                 method: 'PUT',
@@ -30,7 +30,7 @@ const menuItemApis = restaurantSlice.injectEndpoints({
             transformErrorResponse: (response) => response.data.problem,
             invalidatesTags: (_result, _error, arg) => [{ type: 'MenuItem', id: arg.id }]
         }),
-        deleteMenuItem: builder.mutation({
+        deleteMeal: builder.mutation({
             query: (id) => ({
                 url: `MenuItem/${id}`,
                 method: 'DELETE'
@@ -38,7 +38,7 @@ const menuItemApis = restaurantSlice.injectEndpoints({
             transformErrorResponse: (response) => response.data.problem,
             invalidatesTags: [{ type: 'MenuItem', id: 'LIST' }]
         }),
-        getMenuItemById: builder.query({
+        getMealById: builder.query({
             query: (id) => `MenuItem/${id}`,
             transformResponse: (response) => response.data,
             transformErrorResponse: (response) => response.data.problem,
@@ -48,9 +48,9 @@ const menuItemApis = restaurantSlice.injectEndpoints({
 })
 
 export const {
-    useCreateMenuItemMutation,
-    useGetMenuItemsQuery,
-    useUpdateMenuItemMutation,
-    useDeleteMenuItemMutation,
-    useGetMenuItemByIdQuery,
-} = menuItemApis;
+    useCreateMealMutation,
+    useGetMealsQuery,
+    useUpdateMealMutation,
+    useDeleteMealMutation,
+    useGetMealByIdQuery,
+} = mealApis;

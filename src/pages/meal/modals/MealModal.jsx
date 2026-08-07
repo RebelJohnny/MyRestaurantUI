@@ -12,7 +12,7 @@ import {
     TextField,
     Typography,
 } from "@mui/material";
-import { useCreateMenuItemMutation, useGetMenuItemByIdQuery, useUpdateMenuItemMutation } from "@/features/api/menuItemApis";
+import { useCreateMenuItemMutation, useGetMenuItemByIdQuery, useUpdateMenuItemMutation } from "@/features/api/mealApis";
 
 const modalStyle = {
     position: "absolute",
@@ -26,7 +26,7 @@ const modalStyle = {
     p: 3,
 };
 
-export default function MenuItemModal({ id, open, onClose }) {
+export default function MealModal({ id, open, onClose }) {
     /* -------------------------------------------------------------------------- */
     /*                              Redux / RTKQuery                              */
     /* -------------------------------------------------------------------------- */
