@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useFormik } from "formik";
 import {
     Box,
@@ -9,6 +9,7 @@ import {
     Typography,
 } from "@mui/material";
 import { useCreateMealPeriodMutation, useGetMealPeriodByIdQuery, useUpdateMealPeriodMutation } from "@/features/api/mealPeriodApis";
+import { toTimeOfDayInt } from "@/utils/timeFunctions";
 
 
 const modalStyle = {
@@ -55,12 +56,21 @@ export default function MealPeriodModal({ id, open, onClose }) {
         validateOnChange: false,
         validateOnBlur: false,
         onSubmit: async (values) => {
-            console.log(values.time)
+            var submitValues = mapSubmitValues(values)
             !!id
-                ? await updateMealPeriod({ id, args: values }).unwrap().then(onClose).catch((error) => console.error(error))
-                : await createMealPeriod({ id, args: values }).unwrap().then(onClose).catch((error) => console.error(error))
+                ? await updateMealPeriod({ id, args: submitValues }).unwrap().then(onClose).catch((error) => console.error(error))
+                : await createMealPeriod({ id, args: submitValues }).unwrap().then(onClose).catch((error) => console.error(error))
         },
     });
+
+    const mapSubmitValues = useCallback(
+        (values) => {
+            let submitValues = JSON.parse(JSON.stringify(values))
+            submitValues.time = toTimeOfDayInt(values.time);
+            return submitValues
+        },
+        [formik.values]
+    )
 
     // Reset the form whenever the modal closes
     // useEffect(() => {
@@ -88,7 +98,7 @@ export default function MealPeriodModal({ id, open, onClose }) {
                             error={formik.touched.name && Boolean(formik.errors.name)}
                             helperText={formik.touched.name && formik.errors.name}
                         />
-                        {/* <TextField
+                        <TextField
                             name="time"
                             label="ساعت"
                             fullWidth
@@ -97,7 +107,7 @@ export default function MealPeriodModal({ id, open, onClose }) {
                             onBlur={formik.handleBlur}
                             error={formik.touched.time && Boolean(formik.errors.time)}
                             helperText={formik.touched.time && formik.errors.time}
-                        /> */}
+                        />
                         {/* <TimePicker
                             name="time"
                             label="ساعت"

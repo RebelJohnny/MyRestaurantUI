@@ -48,7 +48,7 @@ export default function Menu() {
         isFetching: menusIsFetching,
         isError: menusIsError,
         currentData: menusCurrentData
-    } = useGetMenuQuery({ mealPeriodId, weekDiff },
+    } = useGetMenuQuery({ mealPeriodId, weekDiff, culture: "fa-IR" },
         {
             skip: mealPeriodId === null
         });
@@ -83,7 +83,10 @@ export default function Menu() {
             field: 'date',
             headerName: 'تاریخ',
             width: 100,
-            editable: false
+            editable: false,
+            valueGetter: (date) => {
+                return new Date(date).toLocaleDateString("fa-IR")
+            }
         },
         {
             field: 'meals',
@@ -92,7 +95,12 @@ export default function Menu() {
             editable: false,
             valueGetter: (meals) => {
                 return meals.map((meal) => `${meal.name} - ${getMealTypeName(meal.type)}`).join("\n");
-            }
+            },
+            renderCell: (params) => (
+                <div style={{ whiteSpace: "pre-line" }}>
+                    {params.value}
+                </div>
+            ),
         },
         {
             field: 'actions',
@@ -100,13 +108,13 @@ export default function Menu() {
             headerName: 'عملیات',
             width: 100,
             cellClassName: 'actions',
-            getActions: (rowData) => {
+            getActions: ({ row }) => {
                 return [
                     <GridActionsCellItem
                         icon={<EditIcon />}
                         label="Edit"
                         className="textPrimary"
-                        onClick={handleEditClick(rowData)}
+                        onClick={handleEditClick(row)}
                         color="inherit"
                     />,
                 ]
@@ -137,6 +145,8 @@ export default function Menu() {
                     slotProps={{
                         toolbar: { mealPeriodId, setMealPeriodId },
                     }}
+                    getRowId={(row) => row.date}
+                    getRowHeight={() => "auto"}
                 />
             </Box>
             <Box
@@ -156,7 +166,7 @@ export default function Menu() {
                 </ButtonGroup>
             </Box>
             {createPortal(
-                <MenuModal date={modalData} mealPeriodId={mealPeriodId} open={modalOpen} onClose={() => setModalOpen(false)} />,
+                <MenuModal rowData={modalData} mealPeriodId={mealPeriodId} open={modalOpen} onClose={() => setModalOpen(false)} />,
                 document.body
             )}
         </DashboardLayout>

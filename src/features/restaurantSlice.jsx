@@ -9,5 +9,5 @@ export const restaurantSlice = createApi({
         },
     }),
     endpoints: () => ({}),
-    tagTypes: ['MealPeriod', 'MenuItem', 'Personnel', 'Menu', 'ReservedOrder']
+    tagTypes: ['MealPeriod', 'Meal', 'Personnel', 'Menu', 'Reserve']
 })

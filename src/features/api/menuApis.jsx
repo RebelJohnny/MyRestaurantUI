@@ -19,12 +19,22 @@ const menuApis = restaurantSlice.injectEndpoints({
                 body: args
             }),
             transformErrorResponse: (response) => response.data.problem,
-            invalidatesTags: [{ type: 'Menu', id: 'LIST'}]
+            invalidatesTags: [{ type: 'Menu', id: 'LIST' }]
+        }),
+        getMenuOnDay: builder.query({
+            query: (params) => ({
+                url: `Menu/Day`,
+                params: params
+            }),
+            transformResponse: (response) => response.data,
+            transformErrorResponse: (response) => response.data.problem,
+            keepUnusedDataFor: 0
         })
     })
 })
 
 export const {
     useGetMenuQuery,
-    useUpdateMenuMutation
+    useUpdateMenuMutation,
+    useGetMenuOnDayQuery
 } = menuApis;

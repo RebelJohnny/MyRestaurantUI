@@ -40,13 +40,8 @@ export default function MealsSelect() {
     } = useGetMealsQuery();
 
     const handleChange = (event) => {
-        const {
-            target: { value },
-        } = event;
-        setFieldValue('meals',
-            // On autofill we get a stringified value.
-            typeof value === 'string' ? value.split(',') : value,
-        );
+        const { target: { value } } = event;
+        setFieldValue('meals', value);
     };
 
     return (
@@ -61,10 +56,16 @@ export default function MealsSelect() {
                     onChange={handleChange}
                     input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
                     renderValue={(selected) => (
-                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                            {selected.map((value) => (
-                                <Chip key={value.id} label={value.name} />
-                            ))}
+                        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                            {selected.map((mealId) => {
+                                const meal = data.find((m) => m.id === mealId);
+                                return (
+                                    <Chip
+                                        key={mealId}
+                                        label={meal?.name ?? mealId}
+                                    />
+                                );
+                            })}
                         </Box>
                     )}
                     MenuProps={MenuProps}

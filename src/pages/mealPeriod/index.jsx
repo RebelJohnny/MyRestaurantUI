@@ -15,7 +15,7 @@ import { createPortal } from 'react-dom';
 import MealPeriodModal from './modals/MealPeriodModal';
 import DeleteMealPeriodDialog from './modals/DeleteMealPeriodDialog';
 import { useGetMealPeriodsQuery } from '@/features/api/mealPeriodApis';
-import toTimeString from '@/utils/toTimeString';
+import { toTimeString } from '@/utils/timeFunctions';
 
 function EditToolbar(props) {
     const { setModalOpen } = props;

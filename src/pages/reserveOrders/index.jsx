@@ -3,11 +3,13 @@ import { DataGrid, GridActionsCellItem, GridToolbarContainer } from "@mui/x-data
 import EditIcon from '@mui/icons-material/Edit';
 import MealPeriodSelect from "./MealPeriodsSelect";
 import { createPortal } from "react-dom";
-import ReserveOrdersModal from "./modals/ReserveOrdersModal";
+import ReserveModal from "./modals/ReserveModal";
 import { Box, Button, ButtonGroup } from "@mui/material";
 import { useEffect, useState } from "react";
 import DashboardLayout from "@/layout/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "@/layout/Navbars/DashboardNavbar";
+import PersonnelSelect from "./PersonnelSelect";
+import { useGetPersonnelReservesQuery } from "@/features/api/personnelApis";
 
 const mealTypes = [
     { name: "غذا", value: 0 },
@@ -27,39 +29,40 @@ const daysOfWeek = [
 ]
 
 function Toolbar(props) {
-    const { mealPeriodId, setMealPeriodId } = props;
+    const { mealPeriodId, setMealPeriodId, personnelId, setPersonnelId } = props;
 
     return (
         <GridToolbarContainer>
             <MealPeriodSelect period={mealPeriodId} setPeriod={setMealPeriodId} />
+            <PersonnelSelect personnel={personnelId} setPersonnel={setPersonnelId} />
         </GridToolbarContainer>
     )
 }
 
-export default function Menu() {
-    const [mealPeriodId, setMealPeriodId] = useState(null);
-    const [personnelId, setPersonnelId] = useState(null);
+export default function ReservedOrders() {
+    const [mealPeriodId, setMealPeriodId] = useState('');
+    const [personnelId, setPersonnelId] = useState('');
     const [weekDiff, setWeekDiff] = useState(0)
     /* -------------------------------------------------------------------------- */
     /*                              Redux / RTKQuery                              */
     /* -------------------------------------------------------------------------- */
     /* --------------------------------- Queries -------------------------------- */
     const {
-        data: menus = [],
-        isFetching: menusIsFetching,
-        isError: menusIsError,
-        currentData: menusCurrentData
-    } = useGetMenuQuery({ mealPeriodId, weekDiff },
+        data: reservedOrders = [],
+        isFetching: reservedOrdersIsFetching,
+        isError: reservedOrdersIsError,
+        currentData: reservedOrdersCurrentData
+    } = useGetPersonnelReservesQuery({ id: personnelId, params: {mealPeriodId, weekDiff, culture: "fa-IR"}},
         {
-            skip: mealPeriodId === null
+            skip: mealPeriodId === '' || personnelId === ''
         });
 
     useEffect(() => {
-        if (!menusIsFetching && !menusIsError) {
-            setRows(menus)
+        if (!reservedOrdersIsFetching && !reservedOrdersIsError) {
+            setRows(reservedOrders)
         }
 
-    }, [menusIsFetching, menusCurrentData])
+    }, [reservedOrdersIsFetching, reservedOrdersCurrentData])
     /* -------------------------------------------------------------------------- */
     const [modalData, setModalData] = useState(null);
     const [modalOpen, setModalOpen] = useState(false);
@@ -84,7 +87,10 @@ export default function Menu() {
             field: 'date',
             headerName: 'تاریخ',
             width: 100,
-            editable: false
+            editable: false,
+            valueGetter: (date) => {
+                return new Date(date).toLocaleDateString("fa-IR")
+            }
         },
         {
             field: 'meals',
@@ -93,7 +99,12 @@ export default function Menu() {
             editable: false,
             valueGetter: (meals) => {
                 return meals.map((meal) => `${meal.name} - ${getMealTypeName(meal.type)}`).join("\n");
-            }
+            },
+            renderCell: (params) => (
+                <div style={{ whiteSpace: "pre-line" }}>
+                    {params.value}
+                </div>
+            ),
         },
         {
             field: 'actions',
@@ -101,13 +112,13 @@ export default function Menu() {
             headerName: 'عملیات',
             width: 100,
             cellClassName: 'actions',
-            getActions: (rowData) => {
+            getActions: ({row}) => {
                 return [
                     <GridActionsCellItem
                         icon={<EditIcon />}
                         label="Edit"
                         className="textPrimary"
-                        onClick={handleEditClick(rowData)}
+                        onClick={handleEditClick(row)}
                         color="inherit"
                     />,
                 ]
@@ -136,8 +147,10 @@ export default function Menu() {
                     editMode="row"
                     slots={{ toolbar: Toolbar }}
                     slotProps={{
-                        toolbar: { mealPeriodId, setMealPeriodId },
+                        toolbar: { mealPeriodId, setMealPeriodId, personnelId, setPersonnelId },
                     }}
+                    getRowId={(row) => row.date}
+                    getRowHeight={() => "auto"}
                 />
             </Box>
             <Box
@@ -157,7 +170,7 @@ export default function Menu() {
                 </ButtonGroup>
             </Box>
             {createPortal(
-                <ReserveOrdersModal date={modalData} mealPeriodId={mealPeriodId} open={modalOpen} onClose={() => setModalOpen(false)} />,
+                <ReserveModal rowData={modalData} mealPeriodId={mealPeriodId} personnelId={personnelId} open={modalOpen} onClose={() => setModalOpen(false)} />,
                 document.body
             )}
         </DashboardLayout>

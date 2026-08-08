@@ -5,41 +5,41 @@ const mealApis = restaurantSlice.injectEndpoints({
     endpoints: (builder) => ({
         createMeal: builder.mutation({
             query: ({ args }) => ({
-                url: `MenuItem`,
+                url: `Meal`,
                 method: 'POST',
                 body: args
             }),
             transformResponse: (response) => response.data,
             transformErrorResponse: (response) => response.data.problem,
-            invalidatesTags: [{ type: 'MenuItem', id: 'LIST' }]
+            invalidatesTags: [{ type: 'Meal', id: 'LIST' }]
         }),
         getMeals: builder.query({
             query: () => ({
-                url: `MenuItem`,
+                url: `Meal`,
             }),
             transformResponse: (response) => response.data,
             transformErrorResponse: (response) => response.data.problem,
-            providesTags: (result) => providesListTag(result, 'MenuItem')
+            providesTags: (result) => providesListTag(result, 'Meal')
         }),
         updateMeal: builder.mutation({
             query: ({ id, args }) => ({
-                url: `MenuItem/${id}`,
+                url: `Meal/${id}`,
                 method: 'PUT',
                 body: args
             }),
             transformErrorResponse: (response) => response.data.problem,
-            invalidatesTags: (_result, _error, arg) => [{ type: 'MenuItem', id: arg.id }]
+            invalidatesTags: (_result, _error, arg) => [{ type: 'Meal', id: arg.id }]
         }),
         deleteMeal: builder.mutation({
             query: (id) => ({
-                url: `MenuItem/${id}`,
+                url: `Meal/${id}`,
                 method: 'DELETE'
             }),
             transformErrorResponse: (response) => response.data.problem,
-            invalidatesTags: [{ type: 'MenuItem', id: 'LIST' }]
+            invalidatesTags: [{ type: 'Meal', id: 'LIST' }]
         }),
         getMealById: builder.query({
-            query: (id) => `MenuItem/${id}`,
+            query: (id) => `Meal/${id}`,
             transformResponse: (response) => response.data,
             transformErrorResponse: (response) => response.data.problem,
             keepUnusedDataFor: 0

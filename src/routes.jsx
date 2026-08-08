@@ -33,6 +33,7 @@ import Personnel from "@/pages/personnel";
 import MealPeriod from "@/pages/mealPeriod";
 import Meal from "@/pages/meal";
 import Menu from "@/pages/menu";
+import ReserveOrders from "@/pages/reserveOrders"
 
 const routes = [
   {
@@ -74,6 +75,14 @@ const routes = [
     icon: <Icon fontSize="small">format_textdirection_r_to_l</Icon>,
     route: "/menu",
     component: <Menu />,
+  },
+  {
+    type: "collapse",
+    name: "رزرو",
+    key: "reserve",
+    icon: <Icon fontSize="small">format_textdirection_r_to_l</Icon>,
+    route: "/reserve",
+    component: <ReserveOrders />,
   },
   // {
   //   type: "collapse",

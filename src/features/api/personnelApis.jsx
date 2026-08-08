@@ -44,23 +44,23 @@ const personnelApis = restaurantSlice.injectEndpoints({
             transformErrorResponse: (response) => response.data.problem,
             keepUnusedDataFor: 0
         }),
-        getPersonnelReservedOrders: builder.query({
+        getPersonnelReserves: builder.query({
             query: ({ id, params }) => ({
-                url: `Personnel/ReservedOrders/${id}`,
+                url: `Personnel/Reserves/${id}`,
                 params: params
             }),
             transformResponse: (response) => response.data,
             transformErrorResponse: (response) => response.data.problem,
-            providesTags: (result) => providesListTag(result, 'ReservedOrder')
+            providesTags: (result) => providesListTag(result, 'Reserve')
         }),
-        updatePersonnelReservedOrders: builder.mutation({
+        updatePersonnelReserves: builder.mutation({
             query: ({id, args}) => ({
-                url: `Personnel/ReservedOrders/${id}`,
-                method: 'GET',
+                url: `Personnel/Reserves/${id}`,
+                method: 'PUT',
                 body: args
             }),
             transformErrorResponse: (response) => response.data.problem,
-            invalidatesTags: [{type: 'ReservedOrder', id: 'LIST'}]
+            invalidatesTags: [{type: 'Reserve', id: 'LIST'}]
         })
     })
 })
@@ -71,6 +71,6 @@ export const {
     useUpdatePersonnelMutation,
     useDeletePersonnelMutation,
     useGetPersonnelByIdQuery,
-    useGetPersonnelReservedOrdersQuery,
-    useUpdatePersonnelReservedOrdersMutation
+    useGetPersonnelReservesQuery,
+    useUpdatePersonnelReservesMutation
 } = personnelApis;

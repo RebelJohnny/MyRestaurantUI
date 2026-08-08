@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import { FormikProvider, useFormik } from "formik";
 import {
     Box,
@@ -7,8 +7,8 @@ import {
     Stack,
     Typography,
 } from "@mui/material";
-import { useUpdateMenuMutation } from "@/features/api/menuApis";
 import MealsSelect from "./MealsSelect";
+import { useUpdatePersonnelReservesMutation } from "@/features/api/personnelApis";
 
 const modalStyle = {
     position: "absolute",
@@ -22,9 +22,9 @@ const modalStyle = {
     p: 3,
 };
 
-export default function MenuModal({ rowData, mealPeriodId, open, onClose }) {
+export default function ReserveModal({ rowData, mealPeriodId, personnelId, open, onClose }) {
     /* -------------------------------- Mutations ------------------------------- */
-    const [updateMenu, updateResults] = useUpdateMenuMutation();
+    const [updateReserves, updateResults] = useUpdatePersonnelReservesMutation();
     /* -------------------------------------------------------------------------- */
     const formik = useFormik({
         initialValues: {
@@ -34,13 +34,9 @@ export default function MenuModal({ rowData, mealPeriodId, open, onClose }) {
         validateOnBlur: false,
         onSubmit: async (values) => {
             var submitValues = mapSubmitValues(values);
-            await updateMenu(submitValues).unwrap().then(onClose).catch((error) => console.error(error))
+            await updateReserves({id: personnelId, args: submitValues}).unwrap().then(onClose).catch((error) => console.error(error))
         },
     });
-    useEffect(() => {
-      formik.setFieldValue('meals', rowData?.meals.map((m) => m.id))
-    }, [rowData])
-    
 
     const mapSubmitValues = useCallback(
         (values) => {
@@ -50,6 +46,7 @@ export default function MenuModal({ rowData, mealPeriodId, open, onClose }) {
                 mealPeriodId: mealPeriodId
             }))
             submitValues.date = rowData.date
+            submitValues.personnelId = personnelId
             return submitValues;
         },
         [formik.values]
@@ -66,11 +63,11 @@ export default function MenuModal({ rowData, mealPeriodId, open, onClose }) {
         <Modal open={open} onClose={onClose}>
             <Box sx={modalStyle}>
                 <Typography variant="h6" mb={3}>
-                    {"ویرایش منو"}
+                    {"ویرایش رزرو"}
                 </Typography>
                 <FormikProvider value={formik}>
                     <form onSubmit={formik.handleSubmit}>
-                        <MealsSelect />
+                        <MealsSelect date={rowData?.date} mealPeriodId={mealPeriodId} />
                         <Stack
                             direction="row"
                             spacing={2}
