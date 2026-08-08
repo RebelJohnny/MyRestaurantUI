@@ -5,8 +5,8 @@ import {
     Modal,
     Typography,
 } from "@mui/material";
-import { useUpdateMenuMutation } from "@/features/api/menuApis";
 import MealsSelect from "./MealsSelect";
+import { useUpdatePersonnelReservedOrdersMutation } from "@/features/api/personnelApis";
 
 const modalStyle = {
     position: "absolute",
@@ -20,12 +20,13 @@ const modalStyle = {
     p: 3,
 };
 
-export default function MenuModal({ rowData, mealPeriodId, open, onClose }) {
+export default function ReserveOrdersModal({ rowData, mealPeriodId, personnelId, open, onClose }) {
     /* -------------------------------- Mutations ------------------------------- */
-    const [updateMenu, updateResults] = useUpdateMenuMutation();
+    const [updateReserves, updateResults] = useUpdatePersonnelReservedOrdersMutation();
     /* -------------------------------------------------------------------------- */
     const formik = useFormik({
         initialValues: {
+            personnelId: personnelId,
             date: rowData?.date,
             meals: rowData?.meals ?? [],
         },
@@ -33,7 +34,7 @@ export default function MenuModal({ rowData, mealPeriodId, open, onClose }) {
         validateOnBlur: false,
         onSubmit: async (values) => {
             var submitValues = mapSubmitValues(values);
-            await updateMenu(submitValues).unwrap().then(onClose).catch((error) => console.error(error))
+            await updateReserves(submitValues).unwrap().then(onClose).catch((error) => console.error(error))
         },
     });
 

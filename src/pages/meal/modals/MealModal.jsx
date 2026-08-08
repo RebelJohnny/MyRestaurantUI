@@ -12,7 +12,7 @@ import {
     TextField,
     Typography,
 } from "@mui/material";
-import { useCreateMenuItemMutation, useGetMenuItemByIdQuery, useUpdateMenuItemMutation } from "@/features/api/mealApis";
+import { useCreateMealMutation, useGetMealByIdQuery, useUpdateMealMutation } from "@/features/api/mealApis";
 
 const modalStyle = {
     position: "absolute",
@@ -32,23 +32,23 @@ export default function MealModal({ id, open, onClose }) {
     /* -------------------------------------------------------------------------- */
     /* --------------------------------- Queries -------------------------------- */
     const {
-        data: menuItemData,
-        isFetching: menuItemIsFetching,
-        error: menuItemError,
-        isUninitialized: menuItemIsUnitialized
-    } = useGetMenuItemByIdQuery(id, {
+        data: mealData,
+        isFetching: mealIsFetching,
+        error: mealError,
+        isUninitialized: mealIsUninitialized
+    } = useGetMealByIdQuery(id, {
         skip: id === null,
         refetchOnMountOrArgChange: true
     })
     useEffect(() => {
-        if (!menuItemIsFetching && !menuItemError && !menuItemIsUnitialized) {
-            formik.setValues(menuItemData)
+        if (!mealIsFetching && !mealError && !mealIsUninitialized) {
+            formik.setValues(mealData)
         }
-    }, [menuItemIsFetching])
+    }, [mealIsFetching])
 
     /* -------------------------------- Mutations ------------------------------- */
-    const [createMenuItem, createResults] = useCreateMenuItemMutation();
-    const [updateMenuItem, updateResults] = useUpdateMenuItemMutation();
+    const [createMeal, createResults] = useCreateMealMutation();
+    const [updateMeal, updateResults] = useUpdateMealMutation();
     /* -------------------------------------------------------------------------- */
     const formik = useFormik({
         initialValues: {
@@ -59,8 +59,8 @@ export default function MealModal({ id, open, onClose }) {
         validateOnBlur: false,
         onSubmit: async (values) => {
             !!id
-                ? await updateMenuItem({ id, args: values }).unwrap().then(onClose).catch((error) => console.error(error))
-                : await createMenuItem({ id, args: values }).unwrap().then(onClose).catch((error) => console.error(error))
+                ? await updateMeal({ id, args: values }).unwrap().then(onClose).catch((error) => console.error(error))
+                : await createMeal({ id, args: values }).unwrap().then(onClose).catch((error) => console.error(error))
         },
     });
 
@@ -75,7 +75,7 @@ export default function MealModal({ id, open, onClose }) {
         <Modal open={open} onClose={onClose}>
             <Box sx={modalStyle}>
                 <Typography variant="h6" mb={3}>
-                    {!!id ? "ویرایش پرسنل" : "افزودن پرسنل"}
+                    {!!id ? "ویرایش غذا" : "افزودن غذا"}
                 </Typography>
 
                 <form onSubmit={formik.handleSubmit}>

@@ -31,7 +31,8 @@ import SignUp from "@/pages/authentication/sign-up";
 import Icon from "@mui/material/Icon";
 import Personnel from "@/pages/personnel";
 import MealPeriod from "@/pages/mealPeriod";
-import MenuItem from "@/pages/menuItem";
+import Meal from "@/pages/meal";
+import Menu from "@/pages/menu";
 
 const routes = [
   {
@@ -61,10 +62,18 @@ const routes = [
   {
     type: "collapse",
     name: "غذا",
-    key: "menuItem",
+    key: "meal",
     icon: <Icon fontSize="small">format_textdirection_r_to_l</Icon>,
-    route: "/menuItem",
-    component: <MenuItem />,
+    route: "/meal",
+    component: <Meal />,
+  },
+  {
+    type: "collapse",
+    name: "منو",
+    key: "menu",
+    icon: <Icon fontSize="small">format_textdirection_r_to_l</Icon>,
+    route: "/menu",
+    component: <Menu />,
   },
   // {
   //   type: "collapse",

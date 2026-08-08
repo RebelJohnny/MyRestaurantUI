@@ -3,7 +3,7 @@ import { DataGrid, GridActionsCellItem, GridToolbarContainer } from "@mui/x-data
 import EditIcon from '@mui/icons-material/Edit';
 import MealPeriodSelect from "./MealPeriodsSelect";
 import { createPortal } from "react-dom";
-import MenuModal from "./modals/EditMenuModal";
+import ReserveOrdersModal from "./modals/ReserveOrdersModal";
 import { Box, Button, ButtonGroup } from "@mui/material";
 import { useEffect, useState } from "react";
 import DashboardLayout from "@/layout/LayoutContainers/DashboardLayout";
@@ -37,7 +37,8 @@ function Toolbar(props) {
 }
 
 export default function Menu() {
-    const [mealPeriodId, setMealPeriodId] = useState(null)
+    const [mealPeriodId, setMealPeriodId] = useState(null);
+    const [personnelId, setPersonnelId] = useState(null);
     const [weekDiff, setWeekDiff] = useState(0)
     /* -------------------------------------------------------------------------- */
     /*                              Redux / RTKQuery                              */
@@ -156,7 +157,7 @@ export default function Menu() {
                 </ButtonGroup>
             </Box>
             {createPortal(
-                <MenuModal date={modalData} mealPeriodId={mealPeriodId} open={modalOpen} onClose={() => setModalOpen(false)} />,
+                <ReserveOrdersModal date={modalData} mealPeriodId={mealPeriodId} open={modalOpen} onClose={() => setModalOpen(false)} />,
                 document.body
             )}
         </DashboardLayout>
