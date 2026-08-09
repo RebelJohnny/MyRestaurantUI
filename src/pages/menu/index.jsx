@@ -1,14 +1,16 @@
 import { useGetMenuQuery } from "@/features/api/menuApis";
 import { DataGrid, GridActionsCellItem, GridToolbarContainer } from "@mui/x-data-grid";
-import EditIcon from '@mui/icons-material/Edit';
 import MealPeriodSelect from "./MealPeriodsSelect";
 import { createPortal } from "react-dom";
 import MenuModal from "./modals/EditMenuModal";
-import { Box, Button, ButtonGroup } from "@mui/material";
+import { Alert, Box, Button, ButtonGroup, Card, Snackbar } from "@mui/material";
 import { useEffect, useState } from "react";
-import DashboardLayout from "@/layout/LayoutContainers/DashboardLayout";
-import DashboardNavbar from "@/layout/Navbars/DashboardNavbar";
+import { Edit } from "@mui/icons-material";
 
+const faLocale = {
+    noRowsLabel: 'وعده‌ای یافت نشد', footerTotalRows: 'تعداد کل:',
+    MuiTablePagination: { labelRowsPerPage: 'ردیف در صفحه:' },
+}
 const mealTypes = [
     { name: "غذا", value: 0 },
     { name: "دسر", value: 1 }
@@ -36,8 +38,8 @@ function Toolbar(props) {
     )
 }
 
-export default function Menu() {
-    const [mealPeriodId, setMealPeriodId] = useState(null)
+export default function Menu({ dark }) {
+    const [mealPeriodId, setMealPeriodId] = useState('')
     const [weekDiff, setWeekDiff] = useState(0)
     /* -------------------------------------------------------------------------- */
     /*                              Redux / RTKQuery                              */
@@ -50,7 +52,7 @@ export default function Menu() {
         currentData: menusCurrentData
     } = useGetMenuQuery({ mealPeriodId, weekDiff, culture: "fa-IR" },
         {
-            skip: mealPeriodId === null
+            skip: mealPeriodId === ''
         });
 
     useEffect(() => {
@@ -73,8 +75,8 @@ export default function Menu() {
         {
             field: 'dayOfWeek',
             headerName: 'روز',
-            width: 100,
-            editable: false,
+            flex: 1,
+            minWidth: 180,
             valueGetter: (params) => {
                 return daysOfWeek.find(x => x.value == params).name
             }
@@ -111,7 +113,7 @@ export default function Menu() {
             getActions: ({ row }) => {
                 return [
                     <GridActionsCellItem
-                        icon={<EditIcon />}
+                        icon={<Edit color="primary" />}
                         label="Edit"
                         className="textPrimary"
                         onClick={handleEditClick(row)}
@@ -121,54 +123,45 @@ export default function Menu() {
             }
         }
     ]
+    const [snack, setSnack] = useState({ open: false, msg: '', sev: 'success' })
+    const s = (msg, sev = 'success') => setSnack({ open: true, msg, sev })
 
     return (
-        <DashboardLayout>
-            <DashboardNavbar />
-            <Box
-                sx={{
-                    height: 500,
-                    width: '100%',
-                    '& .actions': {
-                        color: 'text.secondary',
-                    },
-                    '& .textPrimary': {
-                        color: 'text.primary',
-                    },
-                }}
-            >
+        <Box>
+            <Card sx={{ overflow: 'hidden' }}>
                 <DataGrid
                     rows={rows}
                     columns={columns}
-                    editMode="row"
+                    loading={menusIsFetching}
+                    disableColumnResize
+                    disableRowSelectionOnClick
+                    getRowId={(r) => r.date}
+                    pageSizeOptions={[5, 10, 25, 50]}
+                    initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
                     slots={{ toolbar: Toolbar }}
                     slotProps={{
                         toolbar: { mealPeriodId, setMealPeriodId },
                     }}
-                    getRowId={(row) => row.date}
+                    localeText={faLocale}
                     getRowHeight={() => "auto"}
-                />
-            </Box>
-            <Box
-                sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    '& > *': {
-                        m: 1,
-                    },
-                }}
-            >
+                    sx={{
+                        border: 'none', minHeight: 500,
+                        '& .MuiDataGrid-columnHeaders': { bgcolor: dark ? '#1a1f3c' : '#f8fafc', borderRadius: '12px 12px 0 0' },
+                        '& .MuiDataGrid-row:hover': { bgcolor: dark ? 'rgba(99,102,241,0.04)' : 'rgba(99,102,241,0.03)' },
+                    }} />
                 <ButtonGroup size="small" aria-label="Small button group">
                     <Button key="prev" onClick={() => setWeekDiff(weekDiff - 1)}>هفته قبل</Button>
                     <Button key="curr" onClick={() => setWeekDiff(0)}>هفته فعلی</Button>
                     <Button key="next" onClick={() => setWeekDiff(weekDiff + 1)}>هفته بعد</Button>
                 </ButtonGroup>
-            </Box>
+            </Card>
             {createPortal(
                 <MenuModal rowData={modalData} mealPeriodId={mealPeriodId} open={modalOpen} onClose={() => setModalOpen(false)} />,
                 document.body
             )}
-        </DashboardLayout>
+            <Snackbar open={snack.open} autoHideDuration={3000} onClose={() => setSnack((x) => ({ ...x, open: false }))} anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}>
+                <Alert severity={snack.sev} variant="filled" sx={{ borderRadius: 2 }}>{snack.msg}</Alert>
+            </Snackbar>
+        </Box>
     )
 }

@@ -1,38 +1,35 @@
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import AddIcon from '@mui/icons-material/Add';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import {
     DataGrid,
     GridToolbarContainer,
     GridActionsCellItem,
 } from '@mui/x-data-grid';
-import DashboardLayout from '@/layout/LayoutContainers/DashboardLayout';
-import DashboardNavbar from '@/layout/Navbars/DashboardNavbar';
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import MealPeriodModal from './modals/MealPeriodModal';
 import DeleteMealPeriodDialog from './modals/DeleteMealPeriodDialog';
 import { useGetMealPeriodsQuery } from '@/features/api/mealPeriodApis';
 import { toTimeString } from '@/utils/timeFunctions';
+import { Add, Delete, Edit } from '@mui/icons-material';
+import { Alert, Card, Snackbar } from '@mui/material';
+
+const faLocale = {
+    noRowsLabel: 'وعده‌ای یافت نشد', footerTotalRows: 'تعداد کل:',
+    MuiTablePagination: { labelRowsPerPage: 'ردیف در صفحه:' },
+}
 
 function EditToolbar(props) {
     const { setModalOpen } = props;
-    const handleClick = () => {
-        setModalOpen(true);
-    };
 
     return (
-        <GridToolbarContainer>
-            <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
-                افزودن وعده غذایی
-            </Button>
+        <GridToolbarContainer sx={{ p: 1.5, justifyContent: 'flex-end', borderBottom: '1px solid #F1F5F9' }}>
+            <Button variant="contained" startIcon={<Add />} onClick={() => setModalOpen(true)} sx={{ borderRadius: '10px', px: 3 }}>افزودن وعده غذایی</Button>
         </GridToolbarContainer>
     );
 }
 
-export default function MealPeriod() {
+export default function MealPeriod({ dark }) {
     /* -------------------------------------------------------------------------- */
     /*                              Redux / RTKQuery                              */
     /* -------------------------------------------------------------------------- */
@@ -65,14 +62,8 @@ export default function MealPeriod() {
         setModalData(id);
         setDialogOpen(true);
     };
-
     const columns = [
-        {
-            field: 'name',
-            headerName: 'نام',
-            width: 180,
-            editable: false
-        },
+        { field: 'name', headerName: 'نام', flex: 1, minWidth: 180, resizable: false },
         {
             field: 'time',
             headerName: 'ساعت',
@@ -83,56 +74,43 @@ export default function MealPeriod() {
             }
         },
         {
-            field: 'actions',
-            type: 'actions',
-            headerName: 'عملیات',
-            width: 100,
-            cellClassName: 'actions',
+            field: 'actions', type: 'actions', headerName: 'عملیات', width: 100, resizable: false,
             getActions: ({ id }) => {
+                const row = rows.find((r) => r.id === id)
                 return [
-                    <GridActionsCellItem
-                        icon={<EditIcon />}
-                        label="Edit"
-                        className="textPrimary"
-                        onClick={handleEditClick(id)}
-                        color="inherit"
-                    />,
-                    <GridActionsCellItem
-                        icon={<DeleteIcon />}
-                        label="Delete"
-                        onClick={handleDeleteClick(id)}
-                        color="inherit"
-                    />,
-                ];
+                    <GridActionsCellItem key="edit" icon={<Edit color="primary" />} label="ویرایش" onClick={handleEditClick(id)} />,
+                    <GridActionsCellItem key="delete" icon={<Delete color="error" />} label="حذف" onClick={handleDeleteClick(id)} />,
+                ]
             },
         },
-    ];
+    ]
+
+    const [snack, setSnack] = useState({ open: false, msg: '', sev: 'success' })
+
+    const s = (msg, sev = 'success') => setSnack({ open: true, msg, sev })
 
     return (
-        <DashboardLayout>
-            <DashboardNavbar />
-            <Box
-                sx={{
-                    height: 500,
-                    width: '100%',
-                    '& .actions': {
-                        color: 'text.secondary',
-                    },
-                    '& .textPrimary': {
-                        color: 'text.primary',
-                    },
-                }}
-            >
+        <Box>
+            <Card sx={{ overflow: 'hidden' }}>
                 <DataGrid
                     rows={rows}
                     columns={columns}
-                    editMode="row"
+                    loading={mealPeriodsIsFetching}
+                    disableColumnResize
+                    disableRowSelectionOnClick
+                    pageSizeOptions={[5, 10, 25, 50]}
+                    initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
                     slots={{ toolbar: EditToolbar }}
                     slotProps={{
                         toolbar: { setModalOpen },
                     }}
-                />
-            </Box>
+                    localeText={faLocale}
+                    sx={{
+                        border: 'none', minHeight: 500,
+                        '& .MuiDataGrid-columnHeaders': { bgcolor: dark ? '#1a1f3c' : '#f8fafc', borderRadius: '12px 12px 0 0' },
+                        '& .MuiDataGrid-row:hover': { bgcolor: dark ? 'rgba(99,102,241,0.04)' : 'rgba(99,102,241,0.03)' },
+                    }} />
+            </Card>
             {createPortal(
                 <MealPeriodModal id={modalData} open={modalOpen} onClose={() => setModalOpen(false)} />,
                 document.body
@@ -141,6 +119,9 @@ export default function MealPeriod() {
                 <DeleteMealPeriodDialog id={modalData} open={dialogOpen} onClose={() => setDialogOpen(false)} />,
                 document.body
             )}
-        </DashboardLayout>
+            <Snackbar open={snack.open} autoHideDuration={3000} onClose={() => setSnack((x) => ({ ...x, open: false }))} anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}>
+                <Alert severity={snack.sev} variant="filled" sx={{ borderRadius: 2 }}>{snack.msg}</Alert>
+            </Snackbar>
+        </Box>
     );
 }

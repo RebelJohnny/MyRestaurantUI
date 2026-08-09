@@ -1,16 +1,17 @@
-import { useGetMenuQuery } from "@/features/api/menuApis";
 import { DataGrid, GridActionsCellItem, GridToolbarContainer } from "@mui/x-data-grid";
-import EditIcon from '@mui/icons-material/Edit';
 import MealPeriodSelect from "./MealPeriodsSelect";
 import { createPortal } from "react-dom";
 import ReserveModal from "./modals/ReserveModal";
-import { Box, Button, ButtonGroup } from "@mui/material";
+import { Alert, Box, Button, ButtonGroup, Card, Snackbar } from "@mui/material";
 import { useEffect, useState } from "react";
-import DashboardLayout from "@/layout/LayoutContainers/DashboardLayout";
-import DashboardNavbar from "@/layout/Navbars/DashboardNavbar";
 import PersonnelSelect from "./PersonnelSelect";
 import { useGetPersonnelReservesQuery } from "@/features/api/personnelApis";
+import { Edit } from "@mui/icons-material";
 
+const faLocale = {
+    noRowsLabel: 'وعده‌ای یافت نشد', footerTotalRows: 'تعداد کل:',
+    MuiTablePagination: { labelRowsPerPage: 'ردیف در صفحه:' },
+}
 const mealTypes = [
     { name: "غذا", value: 0 },
     { name: "دسر", value: 1 }
@@ -39,7 +40,7 @@ function Toolbar(props) {
     )
 }
 
-export default function ReservedOrders() {
+export default function ReservedOrders({ dark }) {
     const [mealPeriodId, setMealPeriodId] = useState('');
     const [personnelId, setPersonnelId] = useState('');
     const [weekDiff, setWeekDiff] = useState(0)
@@ -52,7 +53,7 @@ export default function ReservedOrders() {
         isFetching: reservedOrdersIsFetching,
         isError: reservedOrdersIsError,
         currentData: reservedOrdersCurrentData
-    } = useGetPersonnelReservesQuery({ id: personnelId, params: {mealPeriodId, weekDiff, culture: "fa-IR"}},
+    } = useGetPersonnelReservesQuery({ id: personnelId, params: { mealPeriodId, weekDiff, culture: "fa-IR" } },
         {
             skip: mealPeriodId === '' || personnelId === ''
         });
@@ -77,8 +78,8 @@ export default function ReservedOrders() {
         {
             field: 'dayOfWeek',
             headerName: 'روز',
-            width: 100,
-            editable: false,
+            flex: 1,
+            minWidth: 180,
             valueGetter: (params) => {
                 return daysOfWeek.find(x => x.value == params).name
             }
@@ -112,10 +113,10 @@ export default function ReservedOrders() {
             headerName: 'عملیات',
             width: 100,
             cellClassName: 'actions',
-            getActions: ({row}) => {
+            getActions: ({ row }) => {
                 return [
                     <GridActionsCellItem
-                        icon={<EditIcon />}
+                        icon={<Edit color="primary" />}
                         label="Edit"
                         className="textPrimary"
                         onClick={handleEditClick(row)}
@@ -125,54 +126,44 @@ export default function ReservedOrders() {
             }
         }
     ]
+    const [snack, setSnack] = useState({ open: false, msg: '', sev: 'success' })
+    const s = (msg, sev = 'success') => setSnack({ open: true, msg, sev })
 
     return (
-        <DashboardLayout>
-            <DashboardNavbar />
-            <Box
-                sx={{
-                    height: 500,
-                    width: '100%',
-                    '& .actions': {
-                        color: 'text.secondary',
-                    },
-                    '& .textPrimary': {
-                        color: 'text.primary',
-                    },
-                }}
-            >
+        <Box>
+            <Card sx={{ overflow: 'hidden' }}>
                 <DataGrid
                     rows={rows}
                     columns={columns}
-                    editMode="row"
+                    loading={reservedOrdersIsFetching}
+                    disableColumnResize
+                    disableRowSelectionOnClick
+                    getRowId={(r) => r.date}
+                    pageSizeOptions={[5, 10, 25, 50]}
+                    initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
                     slots={{ toolbar: Toolbar }}
                     slotProps={{
                         toolbar: { mealPeriodId, setMealPeriodId, personnelId, setPersonnelId },
                     }}
-                    getRowId={(row) => row.date}
-                    getRowHeight={() => "auto"}
-                />
-            </Box>
-            <Box
-                sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    '& > *': {
-                        m: 1,
-                    },
-                }}
-            >
+                    localeText={faLocale}
+                    sx={{
+                        border: 'none', minHeight: 500,
+                        '& .MuiDataGrid-columnHeaders': { bgcolor: dark ? '#1a1f3c' : '#f8fafc', borderRadius: '12px 12px 0 0' },
+                        '& .MuiDataGrid-row:hover': { bgcolor: dark ? 'rgba(99,102,241,0.04)' : 'rgba(99,102,241,0.03)' },
+                    }} />
                 <ButtonGroup size="small" aria-label="Small button group">
                     <Button key="prev" onClick={() => setWeekDiff(weekDiff - 1)}>هفته قبل</Button>
                     <Button key="curr" onClick={() => setWeekDiff(0)}>هفته فعلی</Button>
                     <Button key="next" onClick={() => setWeekDiff(weekDiff + 1)}>هفته بعد</Button>
                 </ButtonGroup>
-            </Box>
+            </Card>
             {createPortal(
                 <ReserveModal rowData={modalData} mealPeriodId={mealPeriodId} personnelId={personnelId} open={modalOpen} onClose={() => setModalOpen(false)} />,
                 document.body
             )}
-        </DashboardLayout>
+            <Snackbar open={snack.open} autoHideDuration={3000} onClose={() => setSnack((x) => ({ ...x, open: false }))} anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}>
+                <Alert severity={snack.sev} variant="filled" sx={{ borderRadius: 2 }}>{snack.msg}</Alert>
+            </Snackbar>
+        </Box>
     )
 }
