@@ -8,6 +8,7 @@ const pageNames = {
   '/meal-period': 'مدیریت وعده غذایی',
   '/meal': 'مدیریت غذا',
   '/menu': 'مدیریت منو',
+  '/reserve': 'رزرو'
 }
 
 export default function Header({ dark }) {
