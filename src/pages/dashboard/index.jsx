@@ -25,11 +25,11 @@ function StatCard({ title, value, icon, gradient, trend, dark }) {
           <Box>
             <Typography sx={{ color: sub, fontSize: '0.8rem', fontWeight: 500, mb: 1 }}>{title}</Typography>
             <Typography sx={{ fontWeight: 800, fontSize: '2rem', lineHeight: 1, color: text }}>{value}</Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 1 }}>
+            {/* <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 1 }}>
               <ArrowUpward sx={{ color: '#10b981', fontSize: 14 }} />
               <Typography sx={{ color: '#10b981', fontWeight: 700, fontSize: '0.75rem' }}>{trend}</Typography>
               <Typography sx={{ color: '#94a3b8', fontSize: '0.7rem' }}>ماه قبل</Typography>
-            </Box>
+            </Box> */}
           </Box>
           <Avatar sx={{ width: 50, height: 50, background: gradient, boxShadow: '0 8px 24px rgba(0,0,0,0.15)' }}>{icon}</Avatar>
         </Box>

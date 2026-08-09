@@ -151,12 +151,21 @@ export default function ReservedOrders({ dark }) {
                         '& .MuiDataGrid-columnHeaders': { bgcolor: dark ? '#1a1f3c' : '#f8fafc', borderRadius: '12px 12px 0 0' },
                         '& .MuiDataGrid-row:hover': { bgcolor: dark ? 'rgba(99,102,241,0.04)' : 'rgba(99,102,241,0.03)' },
                     }} />
+            </Card>
+            <div
+                style={{
+                    marginTop: "10px",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                }}
+            >
                 <ButtonGroup size="small" aria-label="Small button group">
                     <Button key="prev" onClick={() => setWeekDiff(weekDiff - 1)}>هفته قبل</Button>
                     <Button key="curr" onClick={() => setWeekDiff(0)}>هفته فعلی</Button>
                     <Button key="next" onClick={() => setWeekDiff(weekDiff + 1)}>هفته بعد</Button>
                 </ButtonGroup>
-            </Card>
+            </div>
             {createPortal(
                 <ReserveModal rowData={modalData} mealPeriodId={mealPeriodId} personnelId={personnelId} open={modalOpen} onClose={() => setModalOpen(false)} />,
                 document.body

@@ -9,7 +9,7 @@ import {
     Typography,
 } from "@mui/material";
 import { useCreateMealPeriodMutation, useGetMealPeriodByIdQuery, useUpdateMealPeriodMutation } from "@/features/api/mealPeriodApis";
-import { toTimeOfDayInt } from "@/utils/timeFunctions";
+import { toTimeOfDayInt, toTimeString } from "@/utils/timeFunctions";
 
 
 const modalStyle = {
@@ -40,7 +40,9 @@ export default function MealPeriodModal({ id, open, onClose }) {
     })
     useEffect(() => {
         if (!mealPeriodIsFetching && !mealPeriodError && !mealPeriodIsUnitialized) {
-            formik.setValues(mealPeriodData)
+            var temp = JSON.parse(JSON.stringify(mealPeriodData))
+            temp.time = toTimeString(mealPeriodData.time)
+            formik.setValues(temp)
         }
     }, [mealPeriodIsFetching])
 
@@ -59,7 +61,7 @@ export default function MealPeriodModal({ id, open, onClose }) {
             var submitValues = mapSubmitValues(values)
             !!id
                 ? await updateMealPeriod({ id, args: submitValues }).unwrap().then(onClose).catch((error) => console.error(error))
-                : await createMealPeriod({ id, args: submitValues }).unwrap().then(onClose).catch((error) => console.error(error))
+                : await createMealPeriod({ args: submitValues }).unwrap().then(onClose).catch((error) => console.error(error))
         },
     });
 
@@ -73,11 +75,11 @@ export default function MealPeriodModal({ id, open, onClose }) {
     )
 
     // Reset the form whenever the modal closes
-    // useEffect(() => {
-    //     if (!open) {
-    //         formik.resetForm();
-    //     }
-    // }, [open]);
+    useEffect(() => {
+        if (!open && !id) {
+            formik.resetForm();
+        }
+    }, [open]);
 
     return (
         <Modal open={open} onClose={onClose}>

@@ -21,7 +21,7 @@ export default function Sidebar({ collapsed, setCollapsed, dark, setDark }) {
 
   return (
     <Box sx={{
-      width: collapsed ? MINI : DRAWER, height: '100vh', position: 'fixed', top: 0, right: 0,
+      width: collapsed ? MINI : DRAWER, height: '100vh', position: 'fixed', top: 0, left: 0,
       zIndex: 1100, display: 'flex', flexDirection: 'column',
       background: 'linear-gradient(195deg, #1a1f3c 0%, #0f1225 100%)',
       transition: 'width 0.3s cubic-bezier(.4,0,.2,1)',

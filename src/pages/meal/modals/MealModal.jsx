@@ -60,16 +60,16 @@ export default function MealModal({ id, open, onClose }) {
         onSubmit: async (values) => {
             !!id
                 ? await updateMeal({ id, args: values }).unwrap().then(onClose).catch((error) => console.error(error))
-                : await createMeal({ id, args: values }).unwrap().then(onClose).catch((error) => console.error(error))
+                : await createMeal({ args: values }).unwrap().then(onClose).catch((error) => console.error(error))
         },
     });
 
     // Reset the form whenever the modal closes
-    // useEffect(() => {
-    //     if (!open) {
-    //         formik.resetForm();
-    //     }
-    // }, [open]);
+    useEffect(() => {
+        if (!open && !id) {
+            formik.resetForm();
+        }
+    }, [open]);
 
     return (
         <Modal open={open} onClose={onClose}>

@@ -6,6 +6,5 @@ export function toTimeString(number) {
 
 export function toTimeOfDayInt(string) {
     var split = string.split(":");
-    console.log(split)
     return Number(split[0].trim()) * 3600 + Number(split[1].trim()) * 60
 }

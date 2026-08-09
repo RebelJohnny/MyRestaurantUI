@@ -56,16 +56,16 @@ export default function PersonnelModal({ id, open, onClose }) {
         onSubmit: async (values) => {
             !!id
                 ? await updatePersonnel({ id, args: values }).unwrap().then(onClose).catch((error) => console.error(error))
-                : await createPersonnel({ id, args: values }).unwrap().then(onClose).catch((error) => console.error(error))
+                : await createPersonnel({ args: values }).unwrap().then(onClose).catch((error) => console.error(error))
         },
     });
 
     // Reset the form whenever the modal closes
-    // useEffect(() => {
-    //     if (!open) {
-    //         formik.resetForm();
-    //     }
-    // }, [open]);
+    useEffect(() => {
+        if (!open && !id) {
+            formik.resetForm();
+        }
+    }, [open]);
 
     return (
         <Modal open={open} onClose={onClose}>

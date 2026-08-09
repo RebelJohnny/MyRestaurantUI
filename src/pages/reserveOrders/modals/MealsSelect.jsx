@@ -44,7 +44,7 @@ export default function MealsSelect({ date, mealPeriodId }) {
 
     const handleChange = (event) => {
         const { target: { value } } = event;
-        setFieldValue('meals', value);
+        setFieldValue('mealIds', value);
     };
 
     return (
@@ -55,7 +55,7 @@ export default function MealsSelect({ date, mealPeriodId }) {
                     labelId="demo-multiple-chip-label"
                     id="demo-multiple-chip"
                     multiple
-                    value={values.meals}
+                    value={values.mealIds}
                     onChange={handleChange}
                     input={<OutlinedInput id="select-multiple-chip" label="غذا" />}
                     renderValue={(selected) => (
@@ -77,7 +77,7 @@ export default function MealsSelect({ date, mealPeriodId }) {
                         <MenuItem
                             key={meal.id}
                             value={meal.id}
-                            style={getStyles(meal.id, values.meals, theme)}
+                            style={getStyles(meal.id, values.mealIds, theme)}
                         >
                             {meal.name}
                         </MenuItem>

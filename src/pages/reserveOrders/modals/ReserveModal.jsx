@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { FormikProvider, useFormik } from "formik";
 import {
     Box,
@@ -28,7 +28,7 @@ export default function ReserveModal({ rowData, mealPeriodId, personnelId, open,
     /* -------------------------------------------------------------------------- */
     const formik = useFormik({
         initialValues: {
-            meals: [],
+            mealIds: [],
         },
         validateOnChange: false,
         validateOnBlur: false,
@@ -41,23 +41,23 @@ export default function ReserveModal({ rowData, mealPeriodId, personnelId, open,
     const mapSubmitValues = useCallback(
         (values) => {
             let submitValues = JSON.parse(JSON.stringify(values));
-            submitValues.meals = values.meals.map((m) => ({
+            submitValues.meals = values.mealIds.map((m) => ({
                 id: m,
-                mealPeriodId: mealPeriodId
             }))
             submitValues.date = rowData.date
             submitValues.personnelId = personnelId
+            submitValues.mealPeriodId = mealPeriodId
             return submitValues;
         },
         [formik.values]
     )
 
     // Reset the form whenever the modal closes
-    // useEffect(() => {
-    //     if (!open) {
-    //         formik.resetForm();
-    //     }
-    // }, [open]);
+    useEffect(() => {
+        if (!open) {
+            formik.resetForm();
+        }
+    }, [open]);
 
     return (
         <Modal open={open} onClose={onClose}>

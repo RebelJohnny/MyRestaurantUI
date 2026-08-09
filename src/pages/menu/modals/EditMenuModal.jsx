@@ -28,7 +28,7 @@ export default function MenuModal({ rowData, mealPeriodId, open, onClose }) {
     /* -------------------------------------------------------------------------- */
     const formik = useFormik({
         initialValues: {
-            meals: [],
+            mealIds: [],
         },
         validateOnChange: false,
         validateOnBlur: false,
@@ -38,29 +38,26 @@ export default function MenuModal({ rowData, mealPeriodId, open, onClose }) {
         },
     });
     useEffect(() => {
-      formik.setFieldValue('meals', rowData?.meals.map((m) => m.id))
+      formik.setFieldValue('mealIds', rowData?.meals.map((m) => m.id))
     }, [rowData])
     
 
     const mapSubmitValues = useCallback(
         (values) => {
             let submitValues = JSON.parse(JSON.stringify(values));
-            submitValues.meals = values.meals.map((m) => ({
-                id: m,
-                mealPeriodId: mealPeriodId
-            }))
             submitValues.date = rowData.date
+            submitValues.mealPeriodId = mealPeriodId
             return submitValues;
         },
         [formik.values]
     )
 
     // Reset the form whenever the modal closes
-    // useEffect(() => {
-    //     if (!open) {
-    //         formik.resetForm();
-    //     }
-    // }, [open]);
+    useEffect(() => {
+        if (!open) {
+            formik.resetForm();
+        }
+    }, [open]);
 
     return (
         <Modal open={open} onClose={onClose}>

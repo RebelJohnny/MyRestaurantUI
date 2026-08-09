@@ -13,7 +13,7 @@ export default function Layout({ children, dark, setDark, collapsed, setCollapse
     <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: dark ? '#0f172a' : '#f1f5f9' }}>
       <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} dark={dark} setDark={setDark} />
       <Box sx={{
-        mr: `${w}px`, width: `calc(100% - ${w}px)`,
+        ml: `${w}px`, width: `calc(100% - ${w}px)`,
         transition: 'margin-right 0.3s cubic-bezier(.4,0,.2,1)',
         display: 'flex', flexDirection: 'column', minHeight: '100vh',
       }}>

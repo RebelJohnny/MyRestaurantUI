@@ -20,11 +20,15 @@ const faLocale = {
 }
 
 function EditToolbar(props) {
-    const { setModalOpen } = props;
+    const { setModalOpen, setModalData } = props;
 
+    const handleClick = () => {
+        setModalData(null)
+        setModalOpen(true)
+    }
     return (
         <GridToolbarContainer sx={{ p: 1.5, justifyContent: 'flex-end', borderBottom: '1px solid #F1F5F9' }}>
-            <Button variant="contained" startIcon={<Add />} onClick={() => setModalOpen(true)} sx={{ borderRadius: '10px', px: 3 }}>افزودن وعده غذایی</Button>
+            <Button variant="contained" startIcon={<Add />} onClick={handleClick} sx={{ borderRadius: '10px', px: 3 }}>افزودن وعده غذایی</Button>
         </GridToolbarContainer>
     );
 }
@@ -76,7 +80,6 @@ export default function MealPeriod({ dark }) {
         {
             field: 'actions', type: 'actions', headerName: 'عملیات', width: 100, resizable: false,
             getActions: ({ id }) => {
-                const row = rows.find((r) => r.id === id)
                 return [
                     <GridActionsCellItem key="edit" icon={<Edit color="primary" />} label="ویرایش" onClick={handleEditClick(id)} />,
                     <GridActionsCellItem key="delete" icon={<Delete color="error" />} label="حذف" onClick={handleDeleteClick(id)} />,
@@ -102,7 +105,7 @@ export default function MealPeriod({ dark }) {
                     initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
                     slots={{ toolbar: EditToolbar }}
                     slotProps={{
-                        toolbar: { setModalOpen },
+                        toolbar: { setModalOpen, setModalData },
                     }}
                     localeText={faLocale}
                     sx={{
