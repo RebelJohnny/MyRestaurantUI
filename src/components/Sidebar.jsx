@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from 'react-router'
 import { Box, Typography, IconButton, Tooltip, Divider } from '@mui/material'
-import { Dashboard, People, AccessTime, Restaurant, MenuBook, ChevronLeft, ChevronRight, DarkMode, LightMode, EventSeat } from '@mui/icons-material'
+import { Dashboard, People, AccessTime, Restaurant, MenuBook, ChevronLeft, ChevronRight, DarkMode, LightMode, EventSeat, Quiz } from '@mui/icons-material'
 
 const DRAWER = 272
 const MINI = 80
@@ -11,7 +11,8 @@ const menuItems = [
   { label: 'وعده غذایی', icon: <AccessTime />, path: '/mealPeriod' },
   { label: 'غذا', icon: <Restaurant />, path: '/meal' },
   { label: 'منو', icon: <MenuBook />, path: '/menu' },
-  { label: 'رزرو', icon: <EventSeat />, path: '/reserve' }
+  { label: 'رزرو', icon: <EventSeat />, path: '/reserve' },
+  { label: 'تست', icon: <Quiz />, path: '/test' }
 ]
 
 export default function Sidebar({ collapsed, setCollapsed, dark, setDark }) {
