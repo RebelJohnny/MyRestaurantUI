@@ -1,3 +1,4 @@
+import { faIR } from '@mui/material/locale'
 import { createTheme } from '@mui/material/styles'
 
 const palette = {
@@ -192,4 +193,4 @@ export const lightTheme = createTheme({
       },
     },
   },
-})
+}, faIR)

@@ -120,23 +120,20 @@ export default function Test() {
           var rowSelection = table.getState().rowSelection
           const selectedIds = Object.keys(rowSelection).filter(id => rowSelection[id]);
           console.log("selected", selectedIds)
-          console.log(
-            table.getColumn('mrt-row-select')?.getSize()
-          );
           return (
             <Box sx={{ display: 'flex', gap: '2.5rem' }}>
               <Tooltip arrow title="ایجاد">
-                <IconButton onClick={() => refetch()}>
+                <IconButton onClick={handleCreateClick}>
                   <Add />
                 </IconButton>
               </Tooltip>
               <Tooltip arrow title="ویرایش">
-                <IconButton onClick={() => refetch()}>
+                <IconButton disabled={selectedIds.length === 0} onClick={() => handleEditClick(selectedIds[0])}>
                   <Edit />
                 </IconButton>
               </Tooltip>
               <Tooltip arrow title="حذف">
-                <IconButton onClick={() => refetch()}>
+                <IconButton disabled={selectedIds.length === 0} onClick={() => handleDeleteClick(selectedIds[0])}>
                   <Delete />
                 </IconButton>
               </Tooltip>
@@ -162,7 +159,7 @@ export default function Test() {
           }
         }
         enableColumnResizing={true}
-        layoutMode='grid-no-grow'
+        layoutMode='grid'
         localization={MRT_Localization_FA}
         enableColumnFilterModes={true}
         onColumnFilterFnsChange={setColumnFilterFns}
@@ -189,29 +186,15 @@ export default function Test() {
             minSize: 50,
             maxSize: 50,
             grow: false, //new in v2.8 (allow this column to grow to fill in remaining space)
-
-          },
-          'mrt-row-spacer': {
-            size: 50,
-            minSize: 50,
-            maxSize: 50,
-            grow: false,
             muiTableHeadCellProps: {
-              sx: {
-                flex: '0 0 auto !important',
-                backgroundColor: 'red',
-                // display: 'none'
-              },
+              align: 'center'
             },
             muiTableBodyCellProps: {
-              sx: {
-                flex: '0 0 auto !important',
-                backgroundColor: 'red'
-                // display: 'none'
-              },
-            },
+              align: 'center'
+            }
           },
         }}
+        columnResizeDirection='rtl'
         enableRowNumbers={true}
       />
       {createPortal(
