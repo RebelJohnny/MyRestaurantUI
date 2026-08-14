@@ -53,19 +53,19 @@ export default function Test() {
     pageSize: 10,
   });
 
-  console.log("columnFilters", columnFilters)
-  console.log("globalFilter", globalFilter)
-  console.log("sorting", sorting)
-  console.log("pagination", pagination)
-  console.log("columnFilterFns", columnFilterFns)
+  // console.log("columnFilters", columnFilters)
+  // console.log("globalFilter", globalFilter)
+  // console.log("sorting", sorting)
+  // console.log("pagination", pagination)
+  // console.log("columnFilterFns", columnFilterFns)
 
   const {
-    data: personnelData = [],
+    data: personnelData = { data: [], pagination: { totalCount: 0 } },
     isFetching,
     isLoading,
     isError,
     refetch
-  } = useGetPersonnelsQuery();
+  } = useGetPersonnelsQuery({pagination, sorting, columnFilters, columnFilterFns});
 
   const [modalData, setModalData] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -90,13 +90,13 @@ export default function Test() {
     setModalData(null);
     setDialogOpen(false);
   }
-
+console.log(personnelData)
   return (
     <>
       <MaterialReactTable
         columns={columns}
-        data={personnelData}
-        initialState={{ showColumnFilters: true }}
+        data={personnelData.data}
+        initialState={{ showColumnFilters: true, density: 'compact' }}
         muiTableBodyCellProps={{
           sx: {
             direction: 'rtl',
@@ -119,7 +119,6 @@ export default function Test() {
         renderTopToolbarCustomActions={({ table }) => {
           var rowSelection = table.getState().rowSelection
           const selectedIds = Object.keys(rowSelection).filter(id => rowSelection[id]);
-          console.log("selected", selectedIds)
           return (
             <Box sx={{ display: 'flex', gap: '2.5rem' }}>
               <Tooltip arrow title="ایجاد">
@@ -145,7 +144,7 @@ export default function Test() {
             </Box>
           )
         }}
-        rowCount={personnelData?.meta?.totalRowCount ?? 10}
+        rowCount={personnelData.pagination.totalCount ?? pagination.pageSize}
         state={
           {
             columnFilters,

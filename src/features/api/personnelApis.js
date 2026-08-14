@@ -1,3 +1,4 @@
+import { buildQueryParams } from "../buildQueryParams";
 import { providesListTag } from "../providesListTag";
 import { restaurantSlice } from "../restaurantSlice";
 
@@ -14,12 +15,24 @@ const personnelApis = restaurantSlice.injectEndpoints({
             invalidatesTags: [{ type: 'Personnel', id: 'LIST' }]
         }),
         getPersonnels: builder.query({
-            query: () => ({
-                url: `Personnel`,
+            query: ({pagination, sorting, columnFilters, columnFilterFns}) => ({
+                url: `Personnel/GetList`,
+                body: buildQueryParams(pagination, sorting, columnFilters, columnFilterFns),
+                method: 'POST'
             }),
-            transformResponse: (response) => response.data,
+            transformResponse: (response, meta) => {
+                return {
+                    data: response.data,
+                    pagination: {
+                        totalCount: meta.response.headers.get('X-Total-Count'),
+                        pageIndex: meta.response.headers.get('X-Page-Index'),
+                        pageSize: meta.response.headers.get('X-Page-Size'),
+                        totalPages: meta.response.headers.get('X-Total-Pages'),
+                    }
+                }
+            },
             transformErrorResponse: (response) => response.data.problem,
-            providesTags: (result) => providesListTag(result, 'Personnel')
+            providesTags: (result) => providesListTag(result.data, 'Personnel')
         }),
         updatePersonnel: builder.mutation({
             query: ({ id, args }) => ({
