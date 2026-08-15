@@ -7,8 +7,8 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import Chip from '@mui/material/Chip';
+import { useGetAllMealsQuery } from '@/features/api/mealApis';
 import { useFormikContext } from 'formik';
-import { useGetMenuOnDayQuery } from '@/features/api/menuApis';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -31,16 +31,13 @@ function getStyles(mealId, mealIds, theme) {
     };
 }
 
-export default function MealsSelect({ date, mealPeriodId }) {
+export default function MealsSelect() {
     const { values, setFieldValue } = useFormikContext();
     const theme = useTheme();
 
     const {
         data = []
-    } = useGetMenuOnDayQuery({ date, mealPeriodId },
-        {
-            skip: date === null || mealPeriodId === null
-        });
+    } = useGetAllMealsQuery();
 
     const handleChange = (event) => {
         const { target: { value } } = event;
@@ -48,11 +45,10 @@ export default function MealsSelect({ date, mealPeriodId }) {
     };
 
     return (
-        <Box sx={{ minWidth: 200 }}>
-            <FormControl sx={{ marginBottom: 1 }} fullWidth size='small'>
+        <div>
+            <FormControl sx={{ m: 1, width: 300 }}>
                 <InputLabel id="demo-multiple-chip-label">غذا</InputLabel>
                 <Select
-                    size='small'
                     labelId="demo-multiple-chip-label"
                     id="demo-multiple-chip"
                     multiple
@@ -60,7 +56,7 @@ export default function MealsSelect({ date, mealPeriodId }) {
                     onChange={handleChange}
                     input={<OutlinedInput id="select-multiple-chip" label="غذا" />}
                     renderValue={(selected) => (
-                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
                             {selected.map((mealId) => {
                                 const meal = data.find((m) => m.id === mealId);
                                 return (
@@ -85,6 +81,6 @@ export default function MealsSelect({ date, mealPeriodId }) {
                     ))}
                 </Select>
             </FormControl>
-        </Box>
+        </div>
     );
 }

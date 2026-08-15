@@ -4,20 +4,20 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
-import { useGetMealPeriodsQuery } from '@/features/api/mealPeriodApis';
+import { useGetAllMealPeriodsQuery } from '@/features/api/mealPeriodApis';
 
-export default function MealPeriodSelect({period, setPeriod}) {
+export default function MealPeriodSelect({ period, setPeriod }) {
 
     const {
         data = []
-    } = useGetMealPeriodsQuery();
+    } = useGetAllMealPeriodsQuery();
     const handleChange = (event) => {
         setPeriod(event.target.value);
     };
 
     return (
         <Box sx={{ minWidth: 120 }}>
-            <FormControl fullWidth>
+            <FormControl fullWidth size='small'>
                 <InputLabel id="demo-simple-select-label">وعده</InputLabel>
                 <Select
                     labelId="demo-simple-select-label"
@@ -25,7 +25,9 @@ export default function MealPeriodSelect({period, setPeriod}) {
                     value={period}
                     label="وعده"
                     onChange={handleChange}
+                    size='small'
                 >
+
                     {data.map((mealPeriod) => (
                         <MenuItem
                             key={mealPeriod.id}

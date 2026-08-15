@@ -1,3 +1,4 @@
+import { buildQueryParams } from "../buildQueryParams";
 import { providesListTag } from "../providesListTag";
 import { restaurantSlice } from "../restaurantSlice";
 
@@ -13,7 +14,7 @@ const mealApis = restaurantSlice.injectEndpoints({
             transformErrorResponse: (response) => response.data.problem,
             invalidatesTags: [{ type: 'Meal', id: 'LIST' }]
         }),
-        getMeals: builder.query({
+        getAllMeals: builder.query({
             query: () => ({
                 url: `Meal`,
             }),
@@ -44,13 +45,34 @@ const mealApis = restaurantSlice.injectEndpoints({
             transformErrorResponse: (response) => response.data.problem,
             keepUnusedDataFor: 0
         }),
+        getMealList: builder.query({
+            query: ({ pagination, sorting, columnFilters, columnFilterFns }) => ({
+                url: `Meal/GetList`,
+                body: buildQueryParams(pagination, sorting, columnFilters, columnFilterFns),
+                method: 'POST'
+            }),
+            transformResponse: (response, meta) => {
+                return {
+                    data: response.data,
+                    pagination: {
+                        totalCount: meta.response.headers.get('X-Total-Count'),
+                        pageIndex: meta.response.headers.get('X-Page-Index'),
+                        pageSize: meta.response.headers.get('X-Page-Size'),
+                        totalPages: meta.response.headers.get('X-Total-Pages'),
+                    }
+                }
+            },
+            transformErrorResponse: (response) => response.data.problem,
+            providesTags: (result) => providesListTag(result.data, 'Meal')
+        }),
     })
 })
 
 export const {
     useCreateMealMutation,
-    useGetMealsQuery,
+    useGetAllMealsQuery,
     useUpdateMealMutation,
     useDeleteMealMutation,
     useGetMealByIdQuery,
+    useGetMealListQuery
 } = mealApis;

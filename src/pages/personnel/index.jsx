@@ -1,132 +1,208 @@
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
+import { useMemo, useState } from 'react';
 import {
-    DataGrid,
-    GridToolbarContainer,
-    GridActionsCellItem,
-} from '@mui/x-data-grid';
-import { useGetPersonnelsQuery } from '@/features/api/personnelApis';
-import { useState, useEffect } from 'react';
+  getMRT_RowSelectionHandler,
+  MaterialReactTable,
+} from 'material-react-table';
+import { MRT_Localization_FA } from 'material-react-table/locales/fa';
+import { Box, Card, IconButton, Tooltip } from '@mui/material';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import { useGetPersonnelListQuery } from '@/features/api/personnelApis';
+import { Add, Delete, Edit } from '@mui/icons-material';
 import { createPortal } from 'react-dom';
 import PersonnelModal from './modals/PersonnelModal';
-import DeletePersonnelDialog from './modals/deletePersonnelDialog';
-import { Add, Delete, Edit } from '@mui/icons-material';
-import { Alert, Card, Snackbar } from '@mui/material';
+import DeletePersonnelDialog from './modals/DeletePersonnelDialog';
+import { stringFilterModes } from '@/utils/MRT/columnFilterModes';
 
-const faLocale = {
-    noRowsLabel: 'غذایی یافت نشد', footerTotalRows: 'تعداد کل:',
-    MuiTablePagination: { labelRowsPerPage: 'ردیف در صفحه:' },
-}
-function EditToolbar(props) {
-    const { setModalOpen } = props;
-    return (
-        <GridToolbarContainer sx={{ p: 1.5, justifyContent: 'flex-end', borderBottom: '1px solid #F1F5F9' }}>
-            <Button variant="contained" startIcon={<Add />} onClick={() => setModalOpen(true)} sx={{ borderRadius: '10px', px: 3 }}>افزودن پرسنل</Button>
-        </GridToolbarContainer>
-    );
-}
 
-export default function Personnel({ dark }) {
-    /* -------------------------------------------------------------------------- */
-    /*                              Redux / RTKQuery                              */
-    /* -------------------------------------------------------------------------- */
-    /* --------------------------------- Queries -------------------------------- */
-    const {
-        data: personnelsData = [],
-        isFetching: personnelsIsFetching,
-        isError: personnelIsError,
-        currentData: personnelCurrentData
-    } = useGetPersonnelsQuery();
+export default function Personnel() {
+  const columns = useMemo(
+    //column definitions...
+    () => [
+      {
+        accessorKey: 'code',
+        header: 'کد',
+        filterFn: 'contains',
+        minSize: 180,
+        size: 300,
+        grow: true,
+        columnFilterModeOptions: stringFilterModes
+      },
+      {
+        accessorKey: 'name',
+        header: 'نام',
+        filterFn: 'contains',
+        minSize: 180,
+        size: 300,
+        grow: true,
+        columnFilterModeOptions: stringFilterModes
+      }
+    ],
+    [],
+    //end
+  );
+  const [columnFilterFns, setColumnFilterFns] = useState(() =>
+    Object.fromEntries(
+      columns.map((column) => [
+        column.accessorKey,
+        column.filterFn,
+      ]),
+    ),
+  )
+  const [columnFilters, setColumnFilters] = useState([]);
+  const [globalFilter, setGlobalFilter] = useState('');
+  const [sorting, setSorting] = useState([]);
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: 10,
+  });
 
-    useEffect(() => {
-        if (!personnelsIsFetching && !personnelIsError) {
-            setRows(personnelsData);
-        }
-    }, [personnelsIsFetching, personnelCurrentData])
+  const {
+    data: personnelData = { data: [], pagination: { totalCount: 0 } },
+    isFetching,
+    isLoading,
+    isError,
+    refetch
+  } = useGetPersonnelListQuery({ pagination, sorting, columnFilters, columnFilterFns });
 
-    /* -------------------------------------------------------------------------- */
-    const [modalData, setModalData] = useState(null);
-    const [modalOpen, setModalOpen] = useState(false);
-    const [dialogOpen, setDialogOpen] = useState(false);
-    const [rows, setRows] = useState([]);
+  const [modalData, setModalData] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
-    const handleEditClick = (id) => () => {
-        setModalData(id);
-        setModalOpen(true);
-    };
-
-    const handleDeleteClick = (id) => () => {
-        setModalData(id);
-        setDialogOpen(true);
-    };
-
-    const columns = [
-        {
-            field: 'name',
-            headerName: 'نام',
-            flex: 1,
-            minWidth: 180,
-            editable: false
-        },
-        {
-            field: 'code',
-            headerName: 'کد',
-            flex: 1,
-            minWidth: 80,
-            editable: false,
-        },
-        {
-            field: 'actions',
-            type: 'actions',
-            headerName: 'عملیات',
-            width: 100,
-            cellClassName: 'actions',
-            getActions: ({ id }) => {
-                return [
-                    <GridActionsCellItem key="edit" icon={<Edit color="success" />} label="ویرایش" onClick={handleEditClick(id)} />,
-                    <GridActionsCellItem key="delete" icon={<Delete color="error" />} label="حذف" onClick={handleDeleteClick(id)} />,
-                ]
+  const handleCreateClick = () => {
+    setModalOpen(true);
+  }
+  const handleEditClick = (id) => {
+    setModalData(id);
+    setModalOpen(true);
+  }
+  const handleDeleteClick = (id) => {
+    setModalData(id);
+    setDialogOpen(true)
+  }
+  const handleEditModalClose = () => {
+    setModalData(null);
+    setModalOpen(false);
+  }
+  const handleDeleteDialogClose = () => {
+    setModalData(null);
+    setDialogOpen(false);
+  }
+  return (
+    <Box>
+      <Card sx={{ overflow: 'hidden' }}>
+        <MaterialReactTable
+          enableGlobalFilter={false}
+          columns={columns}
+          data={personnelData.data}
+          initialState={{ showColumnFilters: true, density: 'compact' }}
+          muiTableBodyCellProps={{
+            sx: {
+              direction: 'rtl',
+              textAlign: 'unset',
             },
-        },
-    ];
-    const [snack, setSnack] = useState({ open: false, msg: '', sev: 'success' })
+          }}
+          manualFiltering={true} //turn off built-in client-side filtering
+          manualPagination={true} //turn off built-in client-side pagination
+          manualSorting={true} //turn off built-in client-side sorting
+          muiToolbarAlertBannerProps={isError
+            ? {
+              color: 'error',
+              children: 'Error loading data',
+            }
+            : undefined}
+          onColumnFiltersChange={setColumnFilters}
+          onGlobalFilterChange={setGlobalFilter}
+          onPaginationChange={setPagination}
+          onSortingChange={setSorting}
+          renderTopToolbarCustomActions={({ table }) => {
+            var rowSelection = table.getState().rowSelection
+            const selectedIds = Object.keys(rowSelection).filter(id => rowSelection[id]);
+            return (
+              <Box sx={{ display: 'flex', gap: '2.5rem' }}>
+                <Tooltip arrow title="ایجاد">
+                  <IconButton onClick={handleCreateClick}>
+                    <Add />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip arrow title="ویرایش">
+                  <IconButton disabled={selectedIds.length === 0} onClick={() => handleEditClick(selectedIds[0])}>
+                    <Edit />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip arrow title="حذف">
+                  <IconButton disabled={selectedIds.length === 0} onClick={() => handleDeleteClick(selectedIds[0])}>
+                    <Delete />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip arrow title="بارگیری مجدد">
+                  <IconButton onClick={() => refetch()}>
+                    <RefreshIcon />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            )
+          }}
+          rowCount={personnelData.pagination.totalCount ?? pagination.pageSize}
+          state={
+            {
+              columnFilters,
+              globalFilter,
+              isLoading,
+              pagination,
+              showAlertBanner: isError,
+              showProgressBars: isFetching,
+              sorting,
+              columnFilterFns
+            }
+          }
 
-    const s = (msg, sev = 'success') => setSnack({ open: true, msg, sev })
+          layoutMode='grid'
+          localization={MRT_Localization_FA}
+          enableColumnFilterModes={true}
+          onColumnFilterFnsChange={setColumnFilterFns}
+          getRowId={(row) => row.id}
+          enableRowSelection={true}
+          enableMultiRowSelection={false}
+          muiTableBodyRowProps={({ row, staticRowIndex, table }) => ({
+            onClick: (event) =>
+              getMRT_RowSelectionHandler({ row, staticRowIndex, table })(event), //import this helper function from material-react-table
+            sx: { cursor: 'pointer' },
+          })}
+          enableStickyHeader={true}
+          enableStickyFooter={true}
+          displayColumnDefOptions={{
+            'mrt-row-select': {
+              size: 50, //adjust the size of the row select column
+              grow: false, //new in v2.8 (default is false for this column)
+              minSize: 50,
+              maxSize: 50,
+              header: ''
+            },
+            'mrt-row-numbers': {
+              size: 50,
+              minSize: 50,
+              maxSize: 50,
+              grow: false, //new in v2.8 (allow this column to grow to fill in remaining space)
+              muiTableHeadCellProps: {
+                align: 'center'
+              },
+              muiTableBodyCellProps: {
+                align: 'center'
+              }
+            },
+          }}
 
-    return (
-        <Box>
-            <Card sx={{ overflow: 'hidden' }}>
-                <DataGrid
-                    rows={rows}
-                    columns={columns}
-                    loading={personnelsIsFetching}
-                    disableColumnResize
-                    disableRowSelectionOnClick
-                    pageSizeOptions={[5, 10, 25, 50]}
-                    initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
-                    slots={{ toolbar: EditToolbar }}
-                    slotProps={{
-                        toolbar: { setModalOpen },
-                    }}
-                    localeText={faLocale}
-                    getRowHeight={() => "auto"}
-                    sx={{
-                        border: 'none', minHeight: 500,
-                        '& .MuiDataGrid-columnHeaders': { bgcolor: dark ? '#1a1f3c' : '#f8fafc', borderRadius: '12px 12px 0 0' },
-                        '& .MuiDataGrid-row:hover': { bgcolor: dark ? 'rgba(99,102,241,0.04)' : 'rgba(99,102,241,0.03)' },
-                    }} />
-            </Card>
-             {createPortal(
-                 <PersonnelModal id={modalData} open={modalOpen} onClose={() => setModalOpen(false)} />,
-                 document.body
-             )}
-             {createPortal(
-                 <DeletePersonnelDialog id={modalData} open={dialogOpen} onClose={() => setDialogOpen(false)} />,
-                 document.body
-             )}
-            <Snackbar open={snack.open} autoHideDuration={3000} onClose={() => setSnack((x) => ({ ...x, open: false }))} anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}>
-                <Alert severity={snack.sev} variant="filled" sx={{ borderRadius: 2 }}>{snack.msg}</Alert>
-            </Snackbar>
-        </Box>
-    );
-}
+          enableRowNumbers={true}
+        />
+        {createPortal(
+          <PersonnelModal id={modalData} open={modalOpen} onClose={handleEditModalClose} />,
+          document.body
+        )}
+        {createPortal(
+          <DeletePersonnelDialog id={modalData} open={dialogOpen} onClose={handleDeleteDialogClose} />,
+          document.body
+        )}
+      </Card>
+    </Box>
+  );
+};

@@ -12,7 +12,7 @@ const menuItems = [
   { label: 'غذا', icon: <Restaurant />, path: '/meal' },
   { label: 'منو', icon: <MenuBook />, path: '/menu' },
   { label: 'رزرو', icon: <EventSeat />, path: '/reserve' },
-  { label: 'تست', icon: <Quiz />, path: '/test' }
+  // { label: 'تست', icon: <Quiz />, path: '/test' }
 ]
 
 export default function Sidebar({ collapsed, setCollapsed, dark, setDark }) {

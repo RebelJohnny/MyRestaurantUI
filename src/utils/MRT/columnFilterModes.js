@@ -1,0 +1,2 @@
+export const stringFilterModes = ["fuzzy", "contains", "startsWith", "endsWith", "equals", "notEquals", "empty", "notEmpty"];
+export const numericFilterModes = ["equals","notEquals","between","betweenInclusive","greaterThan","greaterThanOrEqualTo","lessThan","lessThanOrEqualTo","empty","notEmpty"]

@@ -14,8 +14,8 @@ const personnelApis = restaurantSlice.injectEndpoints({
             transformErrorResponse: (response) => response.data.problem,
             invalidatesTags: [{ type: 'Personnel', id: 'LIST' }]
         }),
-        getPersonnels: builder.query({
-            query: ({pagination, sorting, columnFilters, columnFilterFns}) => ({
+        getPersonnelList: builder.query({
+            query: ({ pagination, sorting, columnFilters, columnFilterFns }) => ({
                 url: `Personnel/GetList`,
                 body: buildQueryParams(pagination, sorting, columnFilters, columnFilterFns),
                 method: 'POST'
@@ -67,23 +67,32 @@ const personnelApis = restaurantSlice.injectEndpoints({
             providesTags: (result) => providesListTag(result, 'Reserve')
         }),
         updatePersonnelReserves: builder.mutation({
-            query: ({id, args}) => ({
+            query: ({ id, args }) => ({
                 url: `Personnel/Reserves/${id}`,
                 method: 'PUT',
                 body: args
             }),
             transformErrorResponse: (response) => response.data.problem,
-            invalidatesTags: [{type: 'Reserve', id: 'LIST'}]
-        })
+            invalidatesTags: [{ type: 'Reserve', id: 'LIST' }]
+        }),
+        getAllPersonnels: builder.query({
+            query: () => ({
+                url: `Personnel`,
+            }),
+            transformResponse: (response) => response.data,
+            transformErrorResponse: (response) => response.data.problem,
+            providesTags: (result) => providesListTag(result, 'Personnel')
+        }),
     })
 })
 
 export const {
     useCreatePersonnelMutation,
-    useGetPersonnelsQuery,
+    useGetPersonnelListQuery,
     useUpdatePersonnelMutation,
     useDeletePersonnelMutation,
     useGetPersonnelByIdQuery,
     useGetPersonnelReservesQuery,
-    useUpdatePersonnelReservesMutation
+    useUpdatePersonnelReservesMutation,
+    useGetAllPersonnelsQuery
 } = personnelApis;

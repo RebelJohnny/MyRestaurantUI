@@ -23,7 +23,7 @@ const daysOfWeek = [
     { name: "شنبه", value: 6 },
 ]
 
-export default function Menu() {
+export default function Test() {
     const [mealPeriodId, setMealPeriodId] = useState('')
     const [weekDiff, setWeekDiff] = useState(0)
     /* -------------------------------------------------------------------------- */
@@ -42,8 +42,9 @@ export default function Menu() {
     /* -------------------------------------------------------------------------- */
     const [modalData, setModalData] = useState(null);
     const [modalOpen, setModalOpen] = useState(false);
-    console.log(modalOpen)
-    const handleEditClick = (rowData) => {
+
+    const handleEditClick = (rowData) => () => {
+        console.log("does this happen")
         setModalData(rowData);
         setModalOpen(true);
     }
@@ -57,8 +58,8 @@ export default function Menu() {
             {
                 accessorKey: 'dayOfWeek',
                 header: 'روز',
-                minSize: 100,
-                size: 150,
+                minSize: 180,
+                size: 300,
                 grow: 1,
                 Cell: ({ cell }) => {
                     return daysOfWeek.find(x => x.value == cell.getValue()).name
@@ -67,8 +68,8 @@ export default function Menu() {
             {
                 accessorKey: 'date',
                 header: 'تاریخ',
-                minSize: 100,
-                size: 150,
+                minSize: 180,
+                size: 300,
                 grow: 1,
                 Cell: ({ cell }) => new Date(cell.getValue()).toLocaleDateString("fa-IR")
             },
@@ -87,7 +88,7 @@ export default function Menu() {
                             alignItems: 'center',
                             width: '100%',
                             py: 0.5,
-                            direction: 'ltr'
+                            direction: 'rtl'
                         }}
                     >
                         {(cell.getValue() ?? []).map((meal) => (
@@ -110,13 +111,9 @@ export default function Menu() {
         <Box>
             <Card sx={{ overflow: 'hidden' }}>
                 <MaterialReactTable
-                    enableColumnFilters={false}
-                    enableGlobalFilter={false}
-                    enableFilters={false}
-                    enableSorting={false}
                     columns={columns}
                     data={data}
-                    initialState={{ density: 'comfortable' }}
+                    initialState={{ showColumnFilters: true, density: 'compact' }}
                     muiTableBodyCellProps={{
                         sx: {
                             direction: 'rtl',
@@ -130,12 +127,14 @@ export default function Menu() {
                         }
                         : undefined}
                     renderTopToolbarCustomActions={({ table }) => {
-                        var rowSelection = table.getSelectedRowModel().rows
+                        var rowSelection = table.getState().rowSelection
+                        const selectedIds = Object.keys(rowSelection).filter(id => rowSelection[id]);
+                        console.log(rowSelection)
                         return (
                             <>
                                 <Box sx={{ display: 'flex', gap: '2.5rem' }}>
                                     <Tooltip arrow title="ویرایش">
-                                        <IconButton disabled={rowSelection.length === 0} onClick={() => handleEditClick(rowSelection[0].original)}>
+                                        <IconButton disabled={selectedIds.length === 0} onClick={() => handleEditClick(selectedIds[0])}>
                                             <Edit />
                                         </IconButton>
                                     </Tooltip>

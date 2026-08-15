@@ -1,9 +1,9 @@
 import { Box, Typography, Card, CardContent, Avatar, Skeleton, Chip } from '@mui/material'
 import { People, AccessTime, Restaurant, MenuBook, ArrowUpward, CalendarToday } from '@mui/icons-material'
 import { useNavigate } from 'react-router'
-import { useGetPersonnelsQuery } from '@/features/api/personnelApis'
-import { useGetMealPeriodsQuery } from '@/features/api/mealPeriodApis'
-import { useGetMealsQuery } from '@/features/api/mealApis'
+import { useGetAllPersonnelsQuery } from '@/features/api/personnelApis'
+import { useGetAllMealPeriodsQuery } from '@/features/api/mealPeriodApis'
+import { useGetAllMealsQuery } from '@/features/api/mealApis'
 import { useGetMenuQuery } from '@/features/api/menuApis'
 
 function StatCard({ title, value, icon, gradient, trend, dark }) {
@@ -83,9 +83,9 @@ function QuickCard({ icon, title, desc, gradient, onClick, dark }) {
 
 export default function DashboardPage({ dark }) {
   const navigate = useNavigate()
-  const { data: personnels = [], isLoading: pL } = useGetPersonnelsQuery()
-  const { data: periods = [], isLoading: mpL } = useGetMealPeriodsQuery()
-  const { data: meals = [], isLoading: mL } = useGetMealsQuery()
+  const { data: personnels = [], isLoading: pL } = useGetAllPersonnelsQuery()
+  const { data: periods = [], isLoading: mpL } = useGetAllMealPeriodsQuery()
+  const { data: meals = [], isLoading: mL } = useGetAllMealsQuery()
   const { data: menus = [], isLoading: mnL } = useGetMenuQuery()
   const loading = pL || mpL || mL || mnL
 

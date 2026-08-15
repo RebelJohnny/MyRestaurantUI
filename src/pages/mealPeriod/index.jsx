@@ -1,130 +1,209 @@
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
+import { useMemo, useState } from 'react';
 import {
-    DataGrid,
-    GridToolbarContainer,
-    GridActionsCellItem,
-} from '@mui/x-data-grid';
-import { useState, useEffect } from 'react';
+  getMRT_RowSelectionHandler,
+  MaterialReactTable,
+} from 'material-react-table';
+import { MRT_Localization_FA } from 'material-react-table/locales/fa';
+import { Box, Card, IconButton, Tooltip } from '@mui/material';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import { Add, Delete, Edit } from '@mui/icons-material';
 import { createPortal } from 'react-dom';
+import { toTimeString } from '@/utils/timeFunctions';
+import { useGetMealPeriodListQuery } from '@/features/api/mealPeriodApis';
 import MealPeriodModal from './modals/MealPeriodModal';
 import DeleteMealPeriodDialog from './modals/DeleteMealPeriodDialog';
-import { useGetMealPeriodsQuery } from '@/features/api/mealPeriodApis';
-import { toTimeString } from '@/utils/timeFunctions';
-import { Add, Delete, Edit } from '@mui/icons-material';
-import { Alert, Card, Snackbar } from '@mui/material';
+import { stringFilterModes } from '@/utils/MRT/columnFilterModes';
 
-const faLocale = {
-    noRowsLabel: 'وعده‌ای یافت نشد', footerTotalRows: 'تعداد کل:',
-    MuiTablePagination: { labelRowsPerPage: 'ردیف در صفحه:' },
-}
 
-function EditToolbar(props) {
-    const { setModalOpen, setModalData } = props;
+export default function MealPeriod() {
+  const columns = useMemo(
+    //column definitions...
+    () => [
+      {
+        accessorKey: 'name',
+        header: 'نام',
+        filterFn: 'contains',
+        minSize: 180,
+        size: 300,
+        grow: true,
+        columnFilterModeOptions: stringFilterModes
+      },
+      {
+        accessorKey: 'time',
+        header: 'ساعت',
+        filterFn: 'equals',
+        minSize: 180,
+        size: 300,
+        grow: true,
+        Cell: ({ cell }) => toTimeString(cell.getValue())
+      }
+    ],
+    [],
+    //end
+  );
+  const [columnFilterFns, setColumnFilterFns] = useState(() =>
+    Object.fromEntries(
+      columns.map((column) => [
+        column.accessorKey,
+        column.filterFn,
+      ]),
+    ),
+  )
+  const [columnFilters, setColumnFilters] = useState([]);
+  const [globalFilter, setGlobalFilter] = useState('');
+  const [sorting, setSorting] = useState([]);
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: 10,
+  });
 
-    const handleClick = () => {
-        setModalData(null)
-        setModalOpen(true)
-    }
-    return (
-        <GridToolbarContainer sx={{ p: 1.5, justifyContent: 'flex-end', borderBottom: '1px solid #F1F5F9' }}>
-            <Button variant="contained" startIcon={<Add />} onClick={handleClick} sx={{ borderRadius: '10px', px: 3 }}>افزودن وعده غذایی</Button>
-        </GridToolbarContainer>
-    );
-}
+  const {
+    data: mealPeriodData = { data: [], pagination: { totalCount: 0 } },
+    isFetching,
+    isLoading,
+    isError,
+    refetch
+  } = useGetMealPeriodListQuery({ pagination, sorting, columnFilters, columnFilterFns });
 
-export default function MealPeriod({ dark }) {
-    /* -------------------------------------------------------------------------- */
-    /*                              Redux / RTKQuery                              */
-    /* -------------------------------------------------------------------------- */
-    /* --------------------------------- Queries -------------------------------- */
-    const {
-        data: mealPeriodsData = [],
-        isFetching: mealPeriodsIsFetching,
-        isError: mealPeriodIsError,
-        currentData: mealPeriodCurrentData
-    } = useGetMealPeriodsQuery();
+  const [modalData, setModalData] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
-    useEffect(() => {
-        if (!mealPeriodsIsFetching && !mealPeriodIsError) {
-            setRows(mealPeriodsData);
-        }
-    }, [mealPeriodsIsFetching, mealPeriodCurrentData])
-
-    /* -------------------------------------------------------------------------- */
-    const [modalData, setModalData] = useState(null);
-    const [modalOpen, setModalOpen] = useState(false);
-    const [dialogOpen, setDialogOpen] = useState(false);
-    const [rows, setRows] = useState([]);
-
-    const handleEditClick = (id) => () => {
-        setModalData(id);
-        setModalOpen(true);
-    };
-
-    const handleDeleteClick = (id) => () => {
-        setModalData(id);
-        setDialogOpen(true);
-    };
-    const columns = [
-        { field: 'name', headerName: 'نام', flex: 1, minWidth: 180, resizable: false },
-        {
-            field: 'time',
-            headerName: 'ساعت',
-            width: 80,
-            editable: false,
-            valueGetter: (params) => {
-                return toTimeString(params)
-            }
-        },
-        {
-            field: 'actions', type: 'actions', headerName: 'عملیات', width: 100, resizable: false,
-            getActions: ({ id }) => {
-                return [
-                    <GridActionsCellItem key="edit" icon={<Edit color="primary" />} label="ویرایش" onClick={handleEditClick(id)} />,
-                    <GridActionsCellItem key="delete" icon={<Delete color="error" />} label="حذف" onClick={handleDeleteClick(id)} />,
-                ]
+  const handleCreateClick = () => {
+    setModalOpen(true);
+  }
+  const handleEditClick = (id) => {
+    setModalData(id);
+    setModalOpen(true);
+  }
+  const handleDeleteClick = (id) => {
+    setModalData(id);
+    setDialogOpen(true)
+  }
+  const handleEditModalClose = () => {
+    setModalData(null);
+    setModalOpen(false);
+  }
+  const handleDeleteDialogClose = () => {
+    setModalData(null);
+    setDialogOpen(false);
+  }
+  return (
+    <Box>
+      <Card sx={{ overflow: 'hidden' }}>
+        <MaterialReactTable
+          enableGlobalFilter={false}
+          columns={columns}
+          data={mealPeriodData.data}
+          initialState={{ showColumnFilters: true, density: 'compact' }}
+          muiTableBodyCellProps={{
+            sx: {
+              direction: 'rtl',
+              textAlign: 'unset',
             },
-        },
-    ]
+          }}
+          manualFiltering={true} //turn off built-in client-side filtering
+          manualPagination={true} //turn off built-in client-side pagination
+          manualSorting={true} //turn off built-in client-side sorting
+          muiToolbarAlertBannerProps={isError
+            ? {
+              color: 'error',
+              children: 'Error loading data',
+            }
+            : undefined}
+          onColumnFiltersChange={setColumnFilters}
+          onGlobalFilterChange={setGlobalFilter}
+          onPaginationChange={setPagination}
+          onSortingChange={setSorting}
+          renderTopToolbarCustomActions={({ table }) => {
+            var rowSelection = table.getState().rowSelection
+            const selectedIds = Object.keys(rowSelection).filter(id => rowSelection[id]);
+            return (
+              <Box sx={{ display: 'flex', gap: '2.5rem' }}>
+                <Tooltip arrow title="ایجاد">
+                  <IconButton onClick={handleCreateClick}>
+                    <Add />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip arrow title="ویرایش">
+                  <IconButton disabled={selectedIds.length === 0} onClick={() => handleEditClick(selectedIds[0])}>
+                    <Edit />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip arrow title="حذف">
+                  <IconButton disabled={selectedIds.length === 0} onClick={() => handleDeleteClick(selectedIds[0])}>
+                    <Delete />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip arrow title="بارگیری مجدد">
+                  <IconButton onClick={() => refetch()}>
+                    <RefreshIcon />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            )
+          }}
+          rowCount={mealPeriodData.pagination.totalCount ?? pagination.pageSize}
+          state={
+            {
+              columnFilters,
+              globalFilter,
+              isLoading,
+              pagination,
+              showAlertBanner: isError,
+              showProgressBars: isFetching,
+              sorting,
+              columnFilterFns
+            }
+          }
 
-    const [snack, setSnack] = useState({ open: false, msg: '', sev: 'success' })
+          layoutMode='grid'
+          localization={MRT_Localization_FA}
+          enableColumnFilterModes={true}
+          onColumnFilterFnsChange={setColumnFilterFns}
+          getRowId={(row) => row.id}
+          enableRowSelection={true}
+          enableMultiRowSelection={false}
+          muiTableBodyRowProps={({ row, staticRowIndex, table }) => ({
+            onClick: (event) =>
+              getMRT_RowSelectionHandler({ row, staticRowIndex, table })(event), //import this helper function from material-react-table
+            sx: { cursor: 'pointer' },
+          })}
+          enableStickyHeader={true}
+          enableStickyFooter={true}
+          displayColumnDefOptions={{
+            'mrt-row-select': {
+              size: 50, //adjust the size of the row select column
+              grow: false, //new in v2.8 (default is false for this column)
+              minSize: 50,
+              maxSize: 50,
+              header: ''
+            },
+            'mrt-row-numbers': {
+              size: 50,
+              minSize: 50,
+              maxSize: 50,
+              grow: false, //new in v2.8 (allow this column to grow to fill in remaining space)
+              muiTableHeadCellProps: {
+                align: 'center'
+              },
+              muiTableBodyCellProps: {
+                align: 'center'
+              }
+            },
+          }}
 
-    const s = (msg, sev = 'success') => setSnack({ open: true, msg, sev })
-
-    return (
-        <Box>
-            <Card sx={{ overflow: 'hidden' }}>
-                <DataGrid
-                    rows={rows}
-                    columns={columns}
-                    loading={mealPeriodsIsFetching}
-                    disableColumnResize
-                    disableRowSelectionOnClick
-                    pageSizeOptions={[5, 10, 25, 50]}
-                    initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
-                    slots={{ toolbar: EditToolbar }}
-                    slotProps={{
-                        toolbar: { setModalOpen, setModalData },
-                    }}
-                    localeText={faLocale}
-                    sx={{
-                        border: 'none', minHeight: 500,
-                        '& .MuiDataGrid-columnHeaders': { bgcolor: dark ? '#1a1f3c' : '#f8fafc', borderRadius: '12px 12px 0 0' },
-                        '& .MuiDataGrid-row:hover': { bgcolor: dark ? 'rgba(99,102,241,0.04)' : 'rgba(99,102,241,0.03)' },
-                    }} />
-            </Card>
-            {createPortal(
-                <MealPeriodModal id={modalData} open={modalOpen} onClose={() => setModalOpen(false)} />,
-                document.body
-            )}
-            {createPortal(
-                <DeleteMealPeriodDialog id={modalData} open={dialogOpen} onClose={() => setDialogOpen(false)} />,
-                document.body
-            )}
-            <Snackbar open={snack.open} autoHideDuration={3000} onClose={() => setSnack((x) => ({ ...x, open: false }))} anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}>
-                <Alert severity={snack.sev} variant="filled" sx={{ borderRadius: 2 }}>{snack.msg}</Alert>
-            </Snackbar>
-        </Box>
-    );
-}
+          enableRowNumbers={true}
+        />
+        {createPortal(
+          <MealPeriodModal id={modalData} open={modalOpen} onClose={handleEditModalClose} />,
+          document.body
+        )}
+        {DeleteMealPeriodDialog(
+          <DeleteMealPeriodDialog id={modalData} open={dialogOpen} onClose={handleDeleteDialogClose} />,
+          document.body
+        )}
+      </Card>
+    </Box>
+  );
+};

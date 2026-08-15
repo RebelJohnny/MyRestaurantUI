@@ -13,7 +13,7 @@ import ReservedOrders from './pages/reserveOrders'
 import rtlPlugin from "stylis-plugin-rtl";
 import { CacheProvider } from "@emotion/react";
 import createCache from "@emotion/cache";
-import Test from './pages/test'
+import Test from './pages/test/menu'
 
 export default function App() {
   const [dark, setDark] = useState(false)

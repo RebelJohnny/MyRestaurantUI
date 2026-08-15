@@ -7,7 +7,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import Chip from '@mui/material/Chip';
-import { useGetMealsQuery } from '@/features/api/mealApis';
+import { useGetAllMealsQuery } from '@/features/api/mealApis';
 import { useFormikContext } from 'formik';
 
 const ITEM_HEIGHT = 48;
@@ -37,7 +37,7 @@ export default function MealsSelect() {
 
     const {
         data = []
-    } = useGetMealsQuery();
+    } = useGetAllMealsQuery();
 
     const handleChange = (event) => {
         const { target: { value } } = event;
@@ -45,10 +45,11 @@ export default function MealsSelect() {
     };
 
     return (
-        <div>
-            <FormControl sx={{ m: 1, width: 300 }}>
+        <Box sx={{ minWidth: 200 }}>
+            <FormControl sx={{ marginBottom: 1 }} fullWidth size='small'>
                 <InputLabel id="demo-multiple-chip-label">غذا</InputLabel>
                 <Select
+                    size='small'
                     labelId="demo-multiple-chip-label"
                     id="demo-multiple-chip"
                     multiple
@@ -81,6 +82,6 @@ export default function MealsSelect() {
                     ))}
                 </Select>
             </FormControl>
-        </div>
+        </Box>
     );
 }

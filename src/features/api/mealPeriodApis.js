@@ -1,3 +1,4 @@
+import { buildQueryParams } from "../buildQueryParams";
 import { providesListTag } from "../providesListTag";
 import { restaurantSlice } from "../restaurantSlice";
 
@@ -13,7 +14,7 @@ const mealPeriodApis = restaurantSlice.injectEndpoints({
             transformErrorResponse: (response) => response.data.problem,
             invalidatesTags: [{ type: 'MealPeriod', id: 'LIST' }]
         }),
-        getMealPeriods: builder.query({
+        getAllMealPeriods: builder.query({
             query: () => ({
                 url: `MealPeriod`,
             }),
@@ -83,16 +84,37 @@ const mealPeriodApis = restaurantSlice.injectEndpoints({
                     patchResult.undo()
                 }
             },
-        })
+        }),
+        getMealPeriodList: builder.query({
+            query: ({ pagination, sorting, columnFilters, columnFilterFns }) => ({
+                url: `MealPeriod/GetList`,
+                body: buildQueryParams(pagination, sorting, columnFilters, columnFilterFns),
+                method: 'POST'
+            }),
+            transformResponse: (response, meta) => {
+                return {
+                    data: response.data,
+                    pagination: {
+                        totalCount: meta.response.headers.get('X-Total-Count'),
+                        pageIndex: meta.response.headers.get('X-Page-Index'),
+                        pageSize: meta.response.headers.get('X-Page-Size'),
+                        totalPages: meta.response.headers.get('X-Total-Pages'),
+                    }
+                }
+            },
+            transformErrorResponse: (response) => response.data.problem,
+            providesTags: (result) => providesListTag(result.data, 'MealPeriod')
+        }),
     })
 })
 
 export const {
     useCreateMealPeriodMutation,
-    useGetMealPeriodsQuery,
+    useGetAllMealPeriodsQuery,
     useUpdateMealPeriodMutation,
     useDeleteMealPeriodMutation,
     useGetMealPeriodByIdQuery,
     useActivateMealPeriodMutation,
-    useDeactivateMealPeriodMutation
+    useDeactivateMealPeriodMutation,
+    useGetMealPeriodListQuery
 } = mealPeriodApis;

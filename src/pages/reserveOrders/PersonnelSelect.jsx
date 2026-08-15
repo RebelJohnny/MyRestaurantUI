@@ -4,20 +4,20 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
-import { useGetPersonnelsQuery } from '@/features/api/personnelApis';
+import { useGetAllPersonnelsQuery } from '@/features/api/personnelApis';
 
 export default function PersonnelSelect({personnel, setPersonnel}) {
 
     const {
         data = []
-    } = useGetPersonnelsQuery();
+    } = useGetAllPersonnelsQuery();
     const handleChange = (event) => {
         setPersonnel(event.target.value);
     };
 
     return (
         <Box sx={{ minWidth: 120 }}>
-            <FormControl fullWidth>
+            <FormControl fullWidth size='small'>
                 <InputLabel id="demo-simple-select-label">پرسنل</InputLabel>
                 <Select
                     labelId="demo-simple-select-label"
@@ -25,6 +25,7 @@ export default function PersonnelSelect({personnel, setPersonnel}) {
                     value={personnel}
                     label="پرسنل"
                     onChange={handleChange}
+                    size='small'
                 >
                     {data.map((personnel) => (
                         <MenuItem
