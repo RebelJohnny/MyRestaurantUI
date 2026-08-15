@@ -14,6 +14,12 @@ export default function MealPeriodSelect({period, setPeriod}) {
     const handleChange = (event) => {
         setPeriod(event.target.value);
     };
+    React.useEffect(() => {
+      if (data.length === 1) {
+        setPeriod(data[0].id)
+      }
+    }, [data])
+    
 
     return (
         <Box sx={{ minWidth: 120 }}>

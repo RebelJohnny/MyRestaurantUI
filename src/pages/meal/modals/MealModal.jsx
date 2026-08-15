@@ -99,8 +99,8 @@ export default function MealModal({ id, open, onClose }) {
                                 onChange={(event) => formik.setFieldValue('type', event.target.value)}
                                 label="نوع"
                             >
-                                <MenuItem value={0}>غذا</MenuItem>
-                                <MenuItem value={1}>دسر</MenuItem>
+                                <MenuItem value={1}>غذا</MenuItem>
+                                <MenuItem value={2}>دسر</MenuItem>
                             </Select>
                         </FormControl>
 

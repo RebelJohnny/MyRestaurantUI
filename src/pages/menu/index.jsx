@@ -8,11 +8,8 @@ import { Edit } from "@mui/icons-material";
 import { getMealChipSx } from "@/utils/menuDisplayFunctions";
 import { getMRT_RowSelectionHandler, MaterialReactTable } from "material-react-table";
 import { MRT_Localization_FA } from "material-react-table/locales/fa";
+import RefreshIcon from '@mui/icons-material/Refresh';
 
-const mealTypes = [
-    { name: "غذا", value: 0 },
-    { name: "دسر", value: 1 }
-]
 const daysOfWeek = [
     { name: "یک‌شنبه", value: 0 },
     { name: "دوشنبه", value: 1 },
@@ -34,7 +31,8 @@ export default function Menu() {
         data = [],
         isFetching,
         isError,
-        isLoading
+        isLoading,
+        refetch
     } = useGetMenuQuery({ mealPeriodId, weekDiff, culture: "fa-IR" },
         {
             skip: mealPeriodId === ''
@@ -42,7 +40,6 @@ export default function Menu() {
     /* -------------------------------------------------------------------------- */
     const [modalData, setModalData] = useState(null);
     const [modalOpen, setModalOpen] = useState(false);
-    console.log(modalOpen)
     const handleEditClick = (rowData) => {
         setModalData(rowData);
         setModalOpen(true);
@@ -137,6 +134,11 @@ export default function Menu() {
                                     <Tooltip arrow title="ویرایش">
                                         <IconButton disabled={rowSelection.length === 0} onClick={() => handleEditClick(rowSelection[0].original)}>
                                             <Edit />
+                                        </IconButton>
+                                    </Tooltip>
+                                    <Tooltip arrow title="بارگیری مجدد">
+                                        <IconButton onClick={() => refetch()}>
+                                            <RefreshIcon />
                                         </IconButton>
                                     </Tooltip>
                                 </Box>

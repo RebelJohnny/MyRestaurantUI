@@ -16,8 +16,8 @@ import { stringFilterModes } from '@/utils/MRT/columnFilterModes';
 
 export default function Meal() {
   const mealtypes = [
-    { name: "غذا", value: 0 },
-    { name: "دسر", value: 1 }
+    { name: "غذا", value: 1 },
+    { name: "دسر", value: 2 }
   ]
 
   const columns = useMemo(
@@ -35,10 +35,21 @@ export default function Meal() {
       {
         accessorKey: 'type',
         header: 'نوع',
-        filterFn: 'equals',
         minSize: 180,
         size: 300,
         grow: true,
+        enableColumnFilterModes: false,
+        filterFn: 'equals',
+        filterVariant: 'select',
+        filterSelectOptions: mealtypes.map(option => ({
+          label: option.name,
+          value: option.value,
+        })),
+        muiFilterAutocompleteProps: {
+          sx: {
+            textAlign: "right"
+          }
+        },
         Cell: ({ cell }) => mealtypes.find(x => x.value == cell.getValue()).name
       }
     ],
@@ -60,7 +71,8 @@ export default function Meal() {
     pageIndex: 0,
     pageSize: 10,
   });
-
+  console.log(columnFilters)
+  console.log(columnFilterFns)
   const {
     data: mealData = { data: [], pagination: { totalCount: 0 } },
     isFetching,
@@ -100,6 +112,12 @@ export default function Meal() {
           columns={columns}
           data={mealData.data}
           initialState={{ showColumnFilters: true, density: 'compact' }}
+          muiTableHeadCellProps={{
+            sx: {
+              // direction: 'rtl',
+              textAlign: 'unset'
+            }
+          }}
           muiTableBodyCellProps={{
             sx: {
               direction: 'rtl',

@@ -9,11 +9,8 @@ import { MRT_Localization_FA } from "material-react-table/locales/fa";
 import { useGetPersonnelReservesQuery } from "@/features/api/personnelApis";
 import ReserveModal from "./modals/ReserveModal";
 import PersonnelSelect from "./PersonnelSelect";
+import RefreshIcon from '@mui/icons-material/Refresh';
 
-const mealTypes = [
-    { name: "غذا", value: 0 },
-    { name: "دسر", value: 1 }
-]
 const daysOfWeek = [
     { name: "یک‌شنبه", value: 0 },
     { name: "دوشنبه", value: 1 },
@@ -36,7 +33,8 @@ export default function ReservedOrders() {
         data = [],
         isFetching,
         isError,
-        isLoading
+        isLoading,
+        refetch
     } = useGetPersonnelReservesQuery({ id: personnelId, params: { mealPeriodId, weekDiff, culture: "fa-IR" } },
         {
             skip: mealPeriodId === '' || personnelId === ''
@@ -139,6 +137,11 @@ export default function ReservedOrders() {
                                     <Tooltip arrow title="ویرایش">
                                         <IconButton disabled={rowSelection.length === 0} onClick={() => handleEditClick(rowSelection[0].original)}>
                                             <Edit />
+                                        </IconButton>
+                                    </Tooltip>
+                                    <Tooltip arrow title="بارگیری مجدد">
+                                        <IconButton onClick={() => refetch()}>
+                                            <RefreshIcon />
                                         </IconButton>
                                     </Tooltip>
                                 </Box>

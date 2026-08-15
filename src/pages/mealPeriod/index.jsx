@@ -30,8 +30,8 @@ export default function MealPeriod() {
       },
       {
         accessorKey: 'time',
-        header: 'ساعت',
-        filterFn: 'equals',
+        header: 'ساعت شروع',
+        enableColumnFilter: false,
         minSize: 180,
         size: 300,
         grow: true,
@@ -95,7 +95,7 @@ export default function MealPeriod() {
           enableGlobalFilter={false}
           columns={columns}
           data={mealPeriodData.data}
-          initialState={{ showColumnFilters: true, density: 'compact' }}
+          initialState={{ density: 'compact' }}          
           muiTableBodyCellProps={{
             sx: {
               direction: 'rtl',
