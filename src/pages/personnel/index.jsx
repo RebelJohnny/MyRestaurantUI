@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import {
   getMRT_RowSelectionHandler,
   MaterialReactTable,
@@ -22,18 +22,18 @@ export default function Personnel() {
         accessorKey: 'code',
         header: 'کد',
         filterFn: 'contains',
-        minSize: 180,
-        size: 300,
-        grow: true,
+        minSize: 80,
+        size: 100,
+        grow: 1,
         columnFilterModeOptions: stringFilterModes
       },
       {
         accessorKey: 'name',
         header: 'نام',
         filterFn: 'contains',
-        minSize: 180,
-        size: 300,
-        grow: true,
+        minSize: 80,
+        size: 100,
+        grow: 1,
         columnFilterModeOptions: stringFilterModes
       }
     ],
@@ -87,6 +87,10 @@ export default function Personnel() {
     setModalData(null);
     setDialogOpen(false);
   }
+  const lastClickRef = useRef({
+    timeStamp: -1000,
+    rowId: 0
+  })
   return (
     <Box>
       <Card sx={{ overflow: 'hidden' }}>
@@ -118,7 +122,7 @@ export default function Personnel() {
             var rowSelection = table.getState().rowSelection
             const selectedIds = Object.keys(rowSelection).filter(id => rowSelection[id]);
             return (
-              <Box sx={{ display: 'flex', gap: '2.5rem' }}>
+              <Box sx={{ display: 'flex', gap: { sm: '2.5rem', xs: '0.5rem' } }}>
                 <Tooltip arrow title="ایجاد">
                   <IconButton onClick={handleCreateClick}>
                     <Add />
@@ -164,8 +168,23 @@ export default function Personnel() {
           enableRowSelection={true}
           enableMultiRowSelection={false}
           muiTableBodyRowProps={({ row, staticRowIndex, table }) => ({
-            onClick: (event) =>
-              getMRT_RowSelectionHandler({ row, staticRowIndex, table })(event), //import this helper function from material-react-table
+            onClick: (event) => {
+              const DOUBLE_CLICK_TIME = 300;
+              const previousClick = lastClickRef.current;
+              if (previousClick.rowId === row.id && event.timeStamp - previousClick.timeStamp < DOUBLE_CLICK_TIME) {
+                handleEditClick(row.id)
+                if (!row.getIsSelected()) {
+                  getMRT_RowSelectionHandler({ row, staticRowIndex, table })(event)
+                }
+              }
+              else {
+                getMRT_RowSelectionHandler({ row, staticRowIndex, table })(event) //import this helper function from material-react-table
+              }
+              lastClickRef.current = {
+                rowId: row.id,
+                timeStamp: event.timeStamp
+              }
+            },
             sx: { cursor: 'pointer' },
           })}
           enableStickyHeader={true}
@@ -191,7 +210,7 @@ export default function Personnel() {
               }
             },
           }}
-
+          positionToolbarAlertBanner='none'
           enableRowNumbers={true}
         />
         {createPortal(

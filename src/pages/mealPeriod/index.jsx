@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import {
   getMRT_RowSelectionHandler,
   MaterialReactTable,
@@ -23,18 +23,18 @@ export default function MealPeriod() {
         accessorKey: 'name',
         header: 'نام',
         filterFn: 'contains',
-        minSize: 180,
-        size: 300,
-        grow: true,
+        minSize: 80,
+        size: 100,
+        grow: 1,
         columnFilterModeOptions: stringFilterModes
       },
       {
         accessorKey: 'time',
         header: 'ساعت شروع',
         enableColumnFilter: false,
-        minSize: 180,
-        size: 300,
-        grow: true,
+        minSize: 80,
+        size: 100,
+        grow: 1,
         Cell: ({ cell }) => toTimeString(cell.getValue())
       }
     ],
@@ -88,6 +88,16 @@ export default function MealPeriod() {
     setModalData(null);
     setDialogOpen(false);
   }
+  const lastClickRef = useRef({
+    timeStamp: -1000,
+    rowId: 0
+  })
+  const element = document.querySelector('#mrt_mealPeriod tbody tr')
+  console.log(element)
+  const rowHeight = element instanceof Element ? element.getBoundingClientRect().height : '50px' 
+  // const compStyles = window.getComputedStyle(element);
+  console.log(rowHeight)
+  const [density, setDensity] = useState('compact')
   return (
     <Box>
       <Card sx={{ overflow: 'hidden' }}>
@@ -95,7 +105,17 @@ export default function MealPeriod() {
           enableGlobalFilter={false}
           columns={columns}
           data={mealPeriodData.data}
-          initialState={{ density: 'compact' }}          
+          initialState={{ density: 'compact' }}
+          muiTableProps={{
+            id: "mrt_mealPeriod"
+          }}
+          muiTableContainerProps={{
+            sx: {
+              height: "calc(100vh - 22rem)",
+              maxHeight: `600px`,
+              overflowY: 'auto',
+            },
+          }}
           muiTableBodyCellProps={{
             sx: {
               direction: 'rtl',
@@ -119,7 +139,7 @@ export default function MealPeriod() {
             var rowSelection = table.getState().rowSelection
             const selectedIds = Object.keys(rowSelection).filter(id => rowSelection[id]);
             return (
-              <Box sx={{ display: 'flex', gap: '2.5rem' }}>
+              <Box sx={{ display: 'flex', gap: { sm: '2.5rem', xs: '0.5rem' } }}>
                 <Tooltip arrow title="ایجاد">
                   <IconButton onClick={handleCreateClick}>
                     <Add />
@@ -153,7 +173,8 @@ export default function MealPeriod() {
               showAlertBanner: isError,
               showProgressBars: isFetching,
               sorting,
-              columnFilterFns
+              columnFilterFns,
+              density
             }
           }
 
@@ -165,8 +186,23 @@ export default function MealPeriod() {
           enableRowSelection={true}
           enableMultiRowSelection={false}
           muiTableBodyRowProps={({ row, staticRowIndex, table }) => ({
-            onClick: (event) =>
-              getMRT_RowSelectionHandler({ row, staticRowIndex, table })(event), //import this helper function from material-react-table
+            onClick: (event) => {
+              const DOUBLE_CLICK_TIME = 300;
+              const previousClick = lastClickRef.current;
+              if (previousClick.rowId === row.id && event.timeStamp - previousClick.timeStamp < DOUBLE_CLICK_TIME) {
+                handleEditClick(row.id)
+                if (!row.getIsSelected()) {
+                  getMRT_RowSelectionHandler({ row, staticRowIndex, table })(event)
+                }
+              }
+              else {
+                getMRT_RowSelectionHandler({ row, staticRowIndex, table })(event) //import this helper function from material-react-table
+              }
+              lastClickRef.current = {
+                rowId: row.id,
+                timeStamp: event.timeStamp
+              }
+            },
             sx: { cursor: 'pointer' },
           })}
           enableStickyHeader={true}
@@ -192,8 +228,9 @@ export default function MealPeriod() {
               }
             },
           }}
-
+          positionToolbarAlertBanner='none'
           enableRowNumbers={true}
+          onDensityChange={setDensity}
         />
         {createPortal(
           <MealPeriodModal id={modalData} open={modalOpen} onClose={handleEditModalClose} />,

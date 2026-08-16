@@ -3,7 +3,7 @@ import MealPeriodSelect from "./MealPeriodsSelect";
 import { createPortal } from "react-dom";
 import MenuModal from "./modals/EditMenuModal";
 import { Box, Button, ButtonGroup, Card, Chip, IconButton, Tooltip } from "@mui/material";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Edit } from "@mui/icons-material";
 import { getMealChipSx } from "@/utils/menuDisplayFunctions";
 import { getMRT_RowSelectionHandler, MaterialReactTable } from "material-react-table";
@@ -54,8 +54,8 @@ export default function Menu() {
             {
                 accessorKey: 'dayOfWeek',
                 header: 'روز',
-                minSize: 100,
-                size: 150,
+                minSize: 80,
+                size: 80,
                 grow: 1,
                 Cell: ({ cell }) => {
                     return daysOfWeek.find(x => x.value == cell.getValue()).name
@@ -64,16 +64,16 @@ export default function Menu() {
             {
                 accessorKey: 'date',
                 header: 'تاریخ',
-                minSize: 100,
-                size: 150,
+                minSize: 80,
+                size: 80,
                 grow: 1,
                 Cell: ({ cell }) => new Date(cell.getValue()).toLocaleDateString("fa-IR")
             },
             {
                 accessorKey: 'meals',
                 header: 'غذا',
-                minSize: 300,
-                size: 600,
+                minSize: 160,
+                size: 240,
                 grow: 3,
                 Cell: ({ cell }) => (
                     <Box
@@ -102,7 +102,10 @@ export default function Menu() {
         [],
         //end
     );
-
+    const lastClickRef = useRef({
+        timeStamp: -1000,
+        rowId: 0
+    })
     return (
         <Box>
             <Card sx={{ overflow: 'hidden' }}>
@@ -130,7 +133,7 @@ export default function Menu() {
                         var rowSelection = table.getSelectedRowModel().rows
                         return (
                             <>
-                                <Box sx={{ display: 'flex', gap: '2.5rem' }}>
+                                <Box sx={{ display: 'flex', gap: { sm: '2.5rem', xs: '0.5rem' } }}>
                                     <Tooltip arrow title="ویرایش">
                                         <IconButton disabled={rowSelection.length === 0} onClick={() => handleEditClick(rowSelection[0].original)}>
                                             <Edit />
@@ -161,8 +164,23 @@ export default function Menu() {
                     enableRowSelection={true}
                     enableMultiRowSelection={false}
                     muiTableBodyRowProps={({ row, staticRowIndex, table }) => ({
-                        onClick: (event) =>
-                            getMRT_RowSelectionHandler({ row, staticRowIndex, table })(event), //import this helper function from material-react-table
+                        onClick: (event) => {
+                            const DOUBLE_CLICK_TIME = 300;
+                            const previousClick = lastClickRef.current;
+                            if (previousClick.rowId === row.id && event.timeStamp - previousClick.timeStamp < DOUBLE_CLICK_TIME) {
+                                handleEditClick(row.original)
+                                if (!row.getIsSelected()) {
+                                    getMRT_RowSelectionHandler({ row, staticRowIndex, table })(event)
+                                }
+                            }
+                            else {
+                                getMRT_RowSelectionHandler({ row, staticRowIndex, table })(event) //import this helper function from material-react-table
+                            }
+                            lastClickRef.current = {
+                                rowId: row.id,
+                                timeStamp: event.timeStamp
+                            }
+                        },
                         sx: { cursor: 'pointer' },
                     })}
                     enableStickyHeader={true}
@@ -176,6 +194,7 @@ export default function Menu() {
                             header: ''
                         },
                     }}
+                    positionToolbarAlertBanner='none'
                 />
             </Card>
             <div

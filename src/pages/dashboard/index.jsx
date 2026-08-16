@@ -159,7 +159,7 @@ export default function DashboardPage({ dark }) {
         <Card sx={{ background: bg, border: `1px solid ${border}` }}>
           <CardContent sx={{ p: 2.5 }}>
             <Typography fontWeight={700} fontSize="1rem" color={text} mb={2}>دسترسی سریع</Typography>
-            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 1.5 }}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)' }, gap: 1.5 }}>
               {quickAccess.map((q) => (
                 <QuickCard key={q.title} {...q} dark={dark} onClick={() => navigate(q.path)} />
               ))}
