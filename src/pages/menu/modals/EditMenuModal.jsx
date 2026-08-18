@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import { useUpdateMenuMutation } from "@/features/api/menuApis";
 import MealsSelect from "./MealsSelect";
+import { useApiErrorAlert } from "@/components/ErrorSwal";
 
 const modalStyle = {
     position: "absolute",
@@ -26,6 +27,7 @@ const modalStyle = {
 };
 
 export default function MenuModal({ rowData, mealPeriodId, open, onClose }) {
+    const showApiError = useApiErrorAlert();
     /* -------------------------------- Mutations ------------------------------- */
     const [updateMenu, updateResults] = useUpdateMenuMutation();
     /* -------------------------------------------------------------------------- */
@@ -37,13 +39,16 @@ export default function MenuModal({ rowData, mealPeriodId, open, onClose }) {
         validateOnBlur: false,
         onSubmit: async (values) => {
             var submitValues = mapSubmitValues(values);
-            await updateMenu(submitValues).unwrap().then(onClose).catch((error) => console.error(error))
+            await updateMenu(submitValues).unwrap().then(onClose).catch((error) => {
+                console.log(error)
+                showApiError(error)
+            })
         },
     });
     useEffect(() => {
-      formik.setFieldValue('mealIds', rowData?.meals.map((m) => m.id))
+        formik.setFieldValue('mealIds', rowData?.meals.map((m) => m.id))
     }, [rowData])
-    
+
 
     const mapSubmitValues = useCallback(
         (values) => {

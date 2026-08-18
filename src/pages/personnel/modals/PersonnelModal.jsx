@@ -9,6 +9,7 @@ import {
     Typography,
 } from "@mui/material";
 import { useCreatePersonnelMutation, useGetPersonnelByIdQuery, useUpdatePersonnelMutation } from "@/features/api/personnelApis";
+import { useApiErrorAlert } from "@/components/ErrorSwal";
 
 const modalStyle = {
     position: "absolute",
@@ -26,6 +27,7 @@ const modalStyle = {
 };
 
 export default function PersonnelModal({ id, open, onClose }) {
+    const showApiError = useApiErrorAlert();
     /* -------------------------------------------------------------------------- */
     /*                              Redux / RTKQuery                              */
     /* -------------------------------------------------------------------------- */
@@ -58,8 +60,14 @@ export default function PersonnelModal({ id, open, onClose }) {
         validateOnBlur: false,
         onSubmit: async (values) => {
             !!id
-                ? await updatePersonnel({ id, args: values }).unwrap().then(onClose).catch((error) => console.error(error))
-                : await createPersonnel({ args: values }).unwrap().then(onClose).catch((error) => console.error(error))
+                ? await updatePersonnel({ id, args: values }).unwrap().then(onClose).catch((error) => {
+                    console.log(error)
+                    showApiError(error)
+                })
+                : await createPersonnel({ args: values }).unwrap().then(onClose).catch((error) => {
+                    console.log(error)
+                    showApiError(error)
+                })
         },
     });
 
@@ -99,7 +107,7 @@ export default function PersonnelModal({ id, open, onClose }) {
                             error={formik.touched.name && Boolean(formik.errors.name)}
                             helperText={formik.touched.name && formik.errors.name}
                         />
- 
+
                         <Stack
                             direction="row"
                             spacing={2}

@@ -105,14 +105,13 @@ export default function MealPeriod() {
           enableGlobalFilter={false}
           columns={columns}
           data={mealPeriodData.data}
-          initialState={{ density: 'compact' }}
+          initialState={{ density: 'comfortable' }}
           muiTableProps={{
             id: "mrt_mealPeriod"
           }}
           muiTableContainerProps={{
             sx: {
-              height: "calc(100vh - 22rem)",
-              maxHeight: `600px`,
+              height: "calc(100vh - 16rem)",
               overflowY: 'auto',
             },
           }}

@@ -13,7 +13,6 @@ import ReservedOrders from './pages/reserveOrders'
 import rtlPlugin from "stylis-plugin-rtl";
 import { CacheProvider } from "@emotion/react";
 import createCache from "@emotion/cache";
-import Test from './pages/test/menu'
 
 export default function App() {
   const [dark, setDark] = useState(false)
@@ -40,7 +39,6 @@ export default function App() {
             <Route path="/meal" element={<MealPage dark={dark} />} />
             <Route path="/menu" element={<MenuPage dark={dark} />} />
             <Route path='/reserve' element={<ReservedOrders dark={dark} />} />
-            <Route path='/test' element={<Test />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
          </Layout>

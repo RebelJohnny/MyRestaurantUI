@@ -32,6 +32,7 @@
     "stimulsoft-viewer-react": "^2026.3.1",
     "stylis": "^4.4.0",
     "stylis-plugin-rtl": "^2.1.1",
+    "sweetalert2": "^11.26.25",
     "use-debounce": "^10.1.1",
     "uuid": "^14.0.1",
     "yup": "^1.7.1"

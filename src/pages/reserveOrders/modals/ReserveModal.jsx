@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import MealsSelect from "./MealsSelect";
 import { useUpdatePersonnelReservesMutation } from "@/features/api/personnelApis";
+import { useApiErrorAlert } from "@/components/ErrorSwal";
 
 const modalStyle = {
     position: "absolute",
@@ -26,6 +27,7 @@ const modalStyle = {
 };
 
 export default function ReserveModal({ rowData, mealPeriodId, personnelId, open, onClose }) {
+    const showApiError = useApiErrorAlert();
     /* -------------------------------- Mutations ------------------------------- */
     const [updateReserves, updateResults] = useUpdatePersonnelReservesMutation();
     /* -------------------------------------------------------------------------- */
@@ -37,7 +39,10 @@ export default function ReserveModal({ rowData, mealPeriodId, personnelId, open,
         validateOnBlur: false,
         onSubmit: async (values) => {
             var submitValues = mapSubmitValues(values);
-            await updateReserves({id: personnelId, args: submitValues}).unwrap().then(onClose).catch((error) => console.error(error))
+            await updateReserves({id: personnelId, args: submitValues}).unwrap().then(onClose).catch((error) => {
+                console.log(error)
+                showApiError(error)
+            })
         },
     });
 

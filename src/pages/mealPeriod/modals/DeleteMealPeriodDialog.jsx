@@ -1,14 +1,19 @@
+import { useApiErrorAlert } from "@/components/ErrorSwal";
 import { useDeleteMealPeriodMutation } from "@/features/api/mealPeriodApis";
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 
 export default function DeleteMealPeriodDialog({ id, open, onClose }) {
+    const showApiError = useApiErrorAlert();
     /* -------------------------------------------------------------------------- */
     /*                              Redux / RTKQuery                              */
     /* -------------------------------------------------------------------------- */
     /* -------------------------------- Mutations ------------------------------- */
     const [deleteMealPeriod, deleteResults] = useDeleteMealPeriodMutation();
     const handleDelete = async () => {
-        await deleteMealPeriod(id).unwrap().then(onClose).catch((error) => console.error(error))
+        await deleteMealPeriod(id).unwrap().then(onClose).catch((error) => {
+            console.log(error)
+            showApiError(error)
+        })
     }
     /* -------------------------------------------------------------------------- */
     return (

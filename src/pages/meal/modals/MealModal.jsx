@@ -13,6 +13,7 @@ import {
     Typography,
 } from "@mui/material";
 import { useCreateMealMutation, useGetMealByIdQuery, useUpdateMealMutation } from "@/features/api/mealApis";
+import { useApiErrorAlert } from "@/components/ErrorSwal";
 
 const modalStyle = {
     position: "absolute",
@@ -30,6 +31,7 @@ const modalStyle = {
 };
 
 export default function MealModal({ id, open, onClose }) {
+    const showApiError = useApiErrorAlert();
     /* -------------------------------------------------------------------------- */
     /*                              Redux / RTKQuery                              */
     /* -------------------------------------------------------------------------- */
@@ -62,8 +64,14 @@ export default function MealModal({ id, open, onClose }) {
         validateOnBlur: false,
         onSubmit: async (values) => {
             !!id
-                ? await updateMeal({ id, args: values }).unwrap().then(onClose).catch((error) => console.error(error))
-                : await createMeal({ args: values }).unwrap().then(onClose).catch((error) => console.error(error))
+                ? await updateMeal({ id, args: values }).unwrap().then(onClose).catch((error) => {
+                    console.error(error)
+                    showApiError(error)
+                })
+                : await createMeal({ args: values }).unwrap().then(onClose).catch((error) => {
+                    console.error(error)
+                    showApiError(error)
+                })
         },
     });
 

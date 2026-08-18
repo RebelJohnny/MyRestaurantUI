@@ -11,7 +11,7 @@ const mealPeriodApis = restaurantSlice.injectEndpoints({
                 body: args
             }),
             transformResponse: (response) => response.data,
-            transformErrorResponse: (response) => response.data.problem,
+            transformErrorResponse: (response) => response.data,
             invalidatesTags: [{ type: 'MealPeriod', id: 'LIST' }]
         }),
         getAllMealPeriods: builder.query({
@@ -19,7 +19,7 @@ const mealPeriodApis = restaurantSlice.injectEndpoints({
                 url: `MealPeriod`,
             }),
             transformResponse: (response) => response.data,
-            transformErrorResponse: (response) => response.data.problem,
+            transformErrorResponse: (response) => response.data,
             providesTags: (result) => providesListTag(result, 'MealPeriod')
         }),
         updateMealPeriod: builder.mutation({
@@ -28,7 +28,7 @@ const mealPeriodApis = restaurantSlice.injectEndpoints({
                 method: 'PUT',
                 body: args
             }),
-            transformErrorResponse: (response) => response.data.problem,
+            transformErrorResponse: (response) => response.data,
             invalidatesTags: (_result, _error, arg) => [{ type: 'MealPeriod', id: arg.id }]
         }),
         deleteMealPeriod: builder.mutation({
@@ -36,13 +36,13 @@ const mealPeriodApis = restaurantSlice.injectEndpoints({
                 url: `MealPeriod/${id}`,
                 method: 'DELETE'
             }),
-            transformErrorResponse: (response) => response.data.problem,
+            transformErrorResponse: (response) => response.data,
             invalidatesTags: [{ type: 'MealPeriod', id: 'LIST' }]
         }),
         getMealPeriodById: builder.query({
             query: (id) => `MealPeriod/${id}`,
             transformResponse: (response) => response.data,
-            transformErrorResponse: (response) => response.data.problem,
+            transformErrorResponse: (response) => response.data,
             keepUnusedDataFor: 0
         }),
         activateMealPeriod: builder.mutation({
@@ -51,7 +51,7 @@ const mealPeriodApis = restaurantSlice.injectEndpoints({
                 method: 'PUT'
             }),
             transformResponse: (response) => response.data,
-            transformErrorResponse: (response) => response.data.problem,
+            transformErrorResponse: (response) => response.data,
             async onQueryStarted(id , { dispatch, queryFulfilled }) {
                 const patchResult = dispatch(
                     api.util.updateQueryData('getMealPeriods', id, (draft) => {
@@ -71,7 +71,7 @@ const mealPeriodApis = restaurantSlice.injectEndpoints({
                 method: 'PUT'
             }),
             transformResponse: (response) => response.data,
-            transformErrorResponse: (response) => response.data.problem,
+            transformErrorResponse: (response) => response.data,
             async onQueryStarted(id, { dispatch, queryFulfilled }) {
                 const patchResult = dispatch(
                     api.util.updateQueryData('getMealPeriods', id, (draft) => {
@@ -102,7 +102,7 @@ const mealPeriodApis = restaurantSlice.injectEndpoints({
                     }
                 }
             },
-            transformErrorResponse: (response) => response.data.problem,
+            transformErrorResponse: (response) => response.data,
             providesTags: (result) => providesListTag(result.data, 'MealPeriod')
         }),
     })

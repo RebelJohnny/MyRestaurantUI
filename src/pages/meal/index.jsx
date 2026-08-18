@@ -114,7 +114,13 @@ export default function Meal() {
           enableGlobalFilter={false}
           columns={columns}
           data={mealData.data}
-          initialState={{ showColumnFilters: true, density: 'compact' }}
+          initialState={{ showColumnFilters: true, density: 'comfortable' }}
+          muiTableContainerProps={{
+            sx: {
+              height: "calc(100vh - 16rem)",
+              overflowY: 'auto',
+            },
+          }}
           muiTableHeadCellProps={{
             sx: {
               // direction: 'rtl',

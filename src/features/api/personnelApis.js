@@ -11,7 +11,7 @@ const personnelApis = restaurantSlice.injectEndpoints({
                 body: args
             }),
             transformResponse: (response) => response.data,
-            transformErrorResponse: (response) => response.data.problem,
+            transformErrorResponse: (response) => response.data,
             invalidatesTags: [{ type: 'Personnel', id: 'LIST' }]
         }),
         getPersonnelList: builder.query({
@@ -31,7 +31,7 @@ const personnelApis = restaurantSlice.injectEndpoints({
                     }
                 }
             },
-            transformErrorResponse: (response) => response.data.problem,
+            transformErrorResponse: (response) => response.data,
             providesTags: (result) => providesListTag(result.data, 'Personnel')
         }),
         updatePersonnel: builder.mutation({
@@ -40,7 +40,7 @@ const personnelApis = restaurantSlice.injectEndpoints({
                 method: 'PUT',
                 body: args
             }),
-            transformErrorResponse: (response) => response.data.problem,
+            transformErrorResponse: (response) => response.data,
             invalidatesTags: (_result, _error, arg) => [{ type: 'Personnel', id: arg.id }]
         }),
         deletePersonnel: builder.mutation({
@@ -48,13 +48,13 @@ const personnelApis = restaurantSlice.injectEndpoints({
                 url: `Personnel/${id}`,
                 method: 'DELETE'
             }),
-            transformErrorResponse: (response) => response.data.problem,
+            transformErrorResponse: (response) => response.data,
             invalidatesTags: [{ type: 'Personnel', id: 'LIST' }]
         }),
         getPersonnelById: builder.query({
             query: (id) => `Personnel/${id}`,
             transformResponse: (response) => response.data,
-            transformErrorResponse: (response) => response.data.problem,
+            transformErrorResponse: (response) => response.data,
             keepUnusedDataFor: 0
         }),
         getPersonnelReserves: builder.query({
@@ -63,7 +63,7 @@ const personnelApis = restaurantSlice.injectEndpoints({
                 params: params
             }),
             transformResponse: (response) => response.data,
-            transformErrorResponse: (response) => response.data.problem,
+            transformErrorResponse: (response) => response.data,
             providesTags: (result) => providesListTag(result, 'Reserve')
         }),
         updatePersonnelReserves: builder.mutation({
@@ -72,7 +72,7 @@ const personnelApis = restaurantSlice.injectEndpoints({
                 method: 'PUT',
                 body: args
             }),
-            transformErrorResponse: (response) => response.data.problem,
+            transformErrorResponse: (response) => response.data,
             invalidatesTags: [{ type: 'Reserve', id: 'LIST' }]
         }),
         getAllPersonnels: builder.query({
@@ -80,7 +80,7 @@ const personnelApis = restaurantSlice.injectEndpoints({
                 url: `Personnel`,
             }),
             transformResponse: (response) => response.data,
-            transformErrorResponse: (response) => response.data.problem,
+            transformErrorResponse: (response) => response.data,
             providesTags: (result) => providesListTag(result, 'Personnel')
         }),
     })

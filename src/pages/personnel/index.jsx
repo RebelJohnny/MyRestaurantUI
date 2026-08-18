@@ -98,7 +98,13 @@ export default function Personnel() {
           enableGlobalFilter={false}
           columns={columns}
           data={personnelData.data}
-          initialState={{ showColumnFilters: true, density: 'compact' }}
+          initialState={{ showColumnFilters: true, density: 'comfortable' }}
+          muiTableContainerProps={{
+            sx: {
+              height: "calc(100vh - 16rem)",
+              overflowY: 'auto',
+            },
+          }}
           muiTableBodyCellProps={{
             sx: {
               direction: 'rtl',

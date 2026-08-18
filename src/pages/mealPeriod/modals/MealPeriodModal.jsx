@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import { useCreateMealPeriodMutation, useGetMealPeriodByIdQuery, useUpdateMealPeriodMutation } from "@/features/api/mealPeriodApis";
 import { toTimeOfDayInt, toTimeString } from "@/utils/timeFunctions";
+import { useApiErrorAlert } from "@/components/ErrorSwal";
 
 
 const modalStyle = {
@@ -28,6 +29,7 @@ const modalStyle = {
 };
 
 export default function MealPeriodModal({ id, open, onClose }) {
+    const showApiError = useApiErrorAlert();
     /* -------------------------------------------------------------------------- */
     /*                              Redux / RTKQuery                              */
     /* -------------------------------------------------------------------------- */
@@ -63,8 +65,14 @@ export default function MealPeriodModal({ id, open, onClose }) {
         onSubmit: async (values) => {
             var submitValues = mapSubmitValues(values)
             !!id
-                ? await updateMealPeriod({ id, args: submitValues }).unwrap().then(onClose).catch((error) => console.error(error))
-                : await createMealPeriod({ args: submitValues }).unwrap().then(onClose).catch((error) => console.error(error))
+                ? await updateMealPeriod({ id, args: submitValues }).unwrap().then(onClose).catch((error) => {
+                    console.log(error)
+                    showApiError(error)
+                })
+                : await createMealPeriod({ args: submitValues }).unwrap().then(onClose).catch((error) => {
+                    console.log(error)
+                    showApiError(error)
+                })
         },
     });
 

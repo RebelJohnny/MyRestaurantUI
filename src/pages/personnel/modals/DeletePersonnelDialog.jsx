@@ -1,14 +1,19 @@
+import { useApiErrorAlert } from "@/components/ErrorSwal";
 import { useDeletePersonnelMutation } from "@/features/api/personnelApis";
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 
 export default function DeletePersonnelDialog({ id, open, onClose }) {
+    const showApiError = useApiErrorAlert();
     /* -------------------------------------------------------------------------- */
     /*                              Redux / RTKQuery                              */
     /* -------------------------------------------------------------------------- */
     /* -------------------------------- Mutations ------------------------------- */
     const [deletePersonnel, deleteResults] = useDeletePersonnelMutation();
     const handleDelete = async () => {
-        await deletePersonnel(id).unwrap().then(onClose).catch((error) => console.error(error))
+        await deletePersonnel(id).unwrap().then(onClose).catch((error) => {
+            console.log(error)
+            showApiError(error)
+        })
     }
     /* -------------------------------------------------------------------------- */
     return (

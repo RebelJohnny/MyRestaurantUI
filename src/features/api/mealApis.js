@@ -11,7 +11,7 @@ const mealApis = restaurantSlice.injectEndpoints({
                 body: args
             }),
             transformResponse: (response) => response.data,
-            transformErrorResponse: (response) => response.data.problem,
+            transformErrorResponse: (response) => response.data,
             invalidatesTags: [{ type: 'Meal', id: 'LIST' }]
         }),
         getAllMeals: builder.query({
@@ -19,7 +19,7 @@ const mealApis = restaurantSlice.injectEndpoints({
                 url: `Meal`,
             }),
             transformResponse: (response) => response.data,
-            transformErrorResponse: (response) => response.data.problem,
+            transformErrorResponse: (response) => response.data,
             providesTags: (result) => providesListTag(result, 'Meal')
         }),
         updateMeal: builder.mutation({
@@ -28,7 +28,7 @@ const mealApis = restaurantSlice.injectEndpoints({
                 method: 'PUT',
                 body: args
             }),
-            transformErrorResponse: (response) => response.data.problem,
+            transformErrorResponse: (response) => response.data,
             invalidatesTags: (_result, _error, arg) => [{ type: 'Meal', id: arg.id }]
         }),
         deleteMeal: builder.mutation({
@@ -36,13 +36,13 @@ const mealApis = restaurantSlice.injectEndpoints({
                 url: `Meal/${id}`,
                 method: 'DELETE'
             }),
-            transformErrorResponse: (response) => response.data.problem,
+            transformErrorResponse: (response) => response.data,
             invalidatesTags: [{ type: 'Meal', id: 'LIST' }]
         }),
         getMealById: builder.query({
             query: (id) => `Meal/${id}`,
             transformResponse: (response) => response.data,
-            transformErrorResponse: (response) => response.data.problem,
+            transformErrorResponse: (response) => response.data,
             keepUnusedDataFor: 0
         }),
         getMealList: builder.query({
@@ -62,7 +62,7 @@ const mealApis = restaurantSlice.injectEndpoints({
                     }
                 }
             },
-            transformErrorResponse: (response) => response.data.problem,
+            transformErrorResponse: (response) => response.data,
             providesTags: (result) => providesListTag(result.data, 'Meal')
         }),
     })

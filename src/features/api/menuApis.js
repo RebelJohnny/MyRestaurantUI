@@ -9,7 +9,7 @@ const menuApis = restaurantSlice.injectEndpoints({
                 params: params
             }),
             transformResponse: (response) => response.data,
-            transformErrorResponse: (response) => response.data.problem,
+            transformErrorResponse: (response) => response.data,
             providesTags: (result) => providesListTag(result, 'Menu')
         }),
         updateMenu: builder.mutation({
@@ -18,7 +18,7 @@ const menuApis = restaurantSlice.injectEndpoints({
                 method: 'PUT',
                 body: args
             }),
-            transformErrorResponse: (response) => response.data.problem,
+            transformErrorResponse: (response) => response.data,
             invalidatesTags: [{ type: 'Menu', id: 'LIST' }]
         }),
         getMenuOnDay: builder.query({
@@ -27,7 +27,7 @@ const menuApis = restaurantSlice.injectEndpoints({
                 params: params
             }),
             transformResponse: (response) => response.data,
-            transformErrorResponse: (response) => response.data.problem,
+            transformErrorResponse: (response) => response.data,
             keepUnusedDataFor: 0
         })
     })

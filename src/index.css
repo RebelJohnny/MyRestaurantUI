@@ -88,3 +88,35 @@ body {
   transform: translateY(-4px);
   box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.15);
 }
+
+.api-error-popup {
+  direction: rtl;
+  width: min(400px, calc(100vw - 32px));
+  border-radius: 12px;
+  padding: 24px;
+  font-family: inherit;
+}
+
+.api-error-popup .swal2-title {
+  font-family: inherit;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.api-error-popup .swal2-html-container {
+  font-family: inherit;
+  font-size: 0.95rem;
+  line-height: 1.8;
+}
+
+.api-error-confirm-button {
+  font-family: inherit !important;
+  font-size: 0.9rem !important;
+  font-weight: 500 !important;
+  border-radius: 8px !important;
+  padding: 8px 22px !important;
+  box-shadow: none !important;
+}
+.api-error-container {
+  z-index: 99999 !important;
+}
