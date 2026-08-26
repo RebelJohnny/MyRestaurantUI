@@ -110,117 +110,119 @@ export default function ReservedOrders() {
         rowId: 0
     })
     return (
-        <Box>
-            <Card sx={{ overflow: 'hidden' }}>
-                <MaterialReactTable
-                    enableColumnFilters={false}
-                    enableGlobalFilter={false}
-                    enableFilters={false}
-                    enableSorting={false}
-                    columns={columns}
-                    data={data}
-                    initialState={{ density: 'comfortable' }}
-                    muiTableBodyCellProps={{
-                        sx: {
-                            direction: 'rtl',
-                            textAlign: 'unset',
-                        },
-                    }}
-                    muiToolbarAlertBannerProps={isError
-                        ? {
-                            color: 'error',
-                            children: 'Error loading data',
+        <>
+            <Box>
+                <Card sx={{ overflow: 'hidden' }}>
+                    <MaterialReactTable
+                        enableColumnFilters={false}
+                        enableGlobalFilter={false}
+                        enableFilters={false}
+                        enableSorting={false}
+                        columns={columns}
+                        data={data}
+                        initialState={{ density: 'comfortable' }}
+                        muiTableBodyCellProps={{
+                            sx: {
+                                direction: 'rtl',
+                                textAlign: 'unset',
+                            },
+                        }}
+                        muiToolbarAlertBannerProps={isError
+                            ? {
+                                color: 'error',
+                                children: 'Error loading data',
+                            }
+                            : undefined}
+                        renderTopToolbarCustomActions={({ table }) => {
+                            var rowSelection = table.getSelectedRowModel().rows
+                            return (
+                                <>
+                                    <Box sx={{ display: 'flex', gap: { sm: '2.5rem', xs: '0.5rem' } }}>
+                                        <Tooltip arrow title="ویرایش">
+                                            <IconButton disabled={rowSelection.length === 0} onClick={() => handleEditClick(rowSelection[0].original)}>
+                                                <Edit />
+                                            </IconButton>
+                                        </Tooltip>
+                                        <Tooltip arrow title="بارگیری مجدد">
+                                            <IconButton onClick={() => refetch()}>
+                                                <RefreshIcon />
+                                            </IconButton>
+                                        </Tooltip>
+                                    </Box>
+                                    <Box sx={{ display: 'flex', gap: { sm: '2.5rem', xs: '0.5rem' } }}>
+                                        <MealPeriodSelect period={mealPeriodId} setPeriod={setMealPeriodId} />
+                                        <PersonnelSelect personnel={personnelId} setPersonnel={setPersonnelId} />
+                                    </Box>
+                                </>
+                            )
+                        }}
+                        rowCount={data.length}
+                        state={
+                            {
+                                isLoading,
+                                showAlertBanner: isError,
+                                showProgressBars: isFetching,
+                            }
                         }
-                        : undefined}
-                    renderTopToolbarCustomActions={({ table }) => {
-                        var rowSelection = table.getSelectedRowModel().rows
-                        return (
-                            <>
-                                <Box sx={{ display: 'flex', gap: { sm: '2.5rem', xs: '0.5rem' } }}>
-                                    <Tooltip arrow title="ویرایش">
-                                        <IconButton disabled={rowSelection.length === 0} onClick={() => handleEditClick(rowSelection[0].original)}>
-                                            <Edit />
-                                        </IconButton>
-                                    </Tooltip>
-                                    <Tooltip arrow title="بارگیری مجدد">
-                                        <IconButton onClick={() => refetch()}>
-                                            <RefreshIcon />
-                                        </IconButton>
-                                    </Tooltip>
-                                </Box>
-                                <Box sx={{ display: 'flex', gap: { sm: '2.5rem', xs: '0.5rem' } }}>
-                                    <MealPeriodSelect period={mealPeriodId} setPeriod={setMealPeriodId} />
-                                    <PersonnelSelect personnel={personnelId} setPersonnel={setPersonnelId} />
-                                </Box>
-                            </>
-                        )
-                    }}
-                    rowCount={data.length}
-                    state={
-                        {
-                            isLoading,
-                            showAlertBanner: isError,
-                            showProgressBars: isFetching,
-                        }
-                    }
 
-                    layoutMode='grid'
-                    localization={MRT_Localization_FA}
-                    getRowId={(row) => row.date}
-                    enableRowSelection={true}
-                    enableMultiRowSelection={false}
-                    muiTableBodyRowProps={({ row, staticRowIndex, table }) => ({
-                        onClick: (event) => {
-                            const DOUBLE_CLICK_TIME = 300;
-                            const previousClick = lastClickRef.current;
-                            if (previousClick.rowId === row.id && event.timeStamp - previousClick.timeStamp < DOUBLE_CLICK_TIME) {
-                                handleEditClick(row.original)
-                                if (!row.getIsSelected()) {
-                                    getMRT_RowSelectionHandler({ row, staticRowIndex, table })(event)
+                        layoutMode='grid'
+                        localization={MRT_Localization_FA}
+                        getRowId={(row) => row.date}
+                        enableRowSelection={true}
+                        enableMultiRowSelection={false}
+                        muiTableBodyRowProps={({ row, staticRowIndex, table }) => ({
+                            onClick: (event) => {
+                                const DOUBLE_CLICK_TIME = 300;
+                                const previousClick = lastClickRef.current;
+                                if (previousClick.rowId === row.id && event.timeStamp - previousClick.timeStamp < DOUBLE_CLICK_TIME) {
+                                    handleEditClick(row.original)
+                                    if (!row.getIsSelected()) {
+                                        getMRT_RowSelectionHandler({ row, staticRowIndex, table })(event)
+                                    }
                                 }
-                            }
-                            else {
-                                getMRT_RowSelectionHandler({ row, staticRowIndex, table })(event) //import this helper function from material-react-table
-                            }
-                            lastClickRef.current = {
-                                rowId: row.id,
-                                timeStamp: event.timeStamp
-                            }
-                        },
-                        sx: { cursor: 'pointer' },
-                    })}
-                    enableStickyHeader={true}
-                    enableStickyFooter={true}
-                    displayColumnDefOptions={{
-                        'mrt-row-select': {
-                            size: 50, //adjust the size of the row select column
-                            grow: false, //new in v2.8 (default is false for this column)
-                            minSize: 50,
-                            maxSize: 50,
-                            header: ''
-                        },
+                                else {
+                                    getMRT_RowSelectionHandler({ row, staticRowIndex, table })(event) //import this helper function from material-react-table
+                                }
+                                lastClickRef.current = {
+                                    rowId: row.id,
+                                    timeStamp: event.timeStamp
+                                }
+                            },
+                            sx: { cursor: 'pointer' },
+                        })}
+                        enableStickyHeader={true}
+                        enableStickyFooter={true}
+                        displayColumnDefOptions={{
+                            'mrt-row-select': {
+                                size: 50, //adjust the size of the row select column
+                                grow: false, //new in v2.8 (default is false for this column)
+                                minSize: 50,
+                                maxSize: 50,
+                                header: ''
+                            },
+                        }}
+                        positionToolbarAlertBanner='none'
+                    />
+                </Card>
+                <div
+                    style={{
+                        marginTop: "10px",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
                     }}
-                    positionToolbarAlertBanner='none'
-                />
-            </Card>
-            <div
-                style={{
-                    marginTop: "10px",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                }}
-            >
-                <ButtonGroup size="small" aria-label="Small button group">
-                    <Button key="prev" onClick={() => setWeekDiff(weekDiff - 1)}>هفته قبل</Button>
-                    <Button key="curr" onClick={() => setWeekDiff(0)}>هفته فعلی</Button>
-                    <Button key="next" onClick={() => setWeekDiff(weekDiff + 1)}>هفته بعد</Button>
-                </ButtonGroup>
-            </div>
-            {createPortal(
+                >
+                    <ButtonGroup size="small" aria-label="Small button group">
+                        <Button key="prev" onClick={() => setWeekDiff(weekDiff - 1)}>هفته قبل</Button>
+                        <Button key="curr" onClick={() => setWeekDiff(0)}>هفته فعلی</Button>
+                        <Button key="next" onClick={() => setWeekDiff(weekDiff + 1)}>هفته بعد</Button>
+                    </ButtonGroup>
+                </div>
+            </Box>
+            {modalOpen && createPortal(
                 <ReserveModal personnelId={personnelId} rowData={modalData} mealPeriodId={mealPeriodId} open={modalOpen} onClose={handleEditModalClose} />,
                 document.body
             )}
-        </Box>
+        </>
     )
 }
