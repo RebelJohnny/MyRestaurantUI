@@ -33,7 +33,7 @@ export default function ReserveModal({ rowData, mealPeriodId, personnelId, open,
     /* -------------------------------------------------------------------------- */
     const formik = useFormik({
         initialValues: {
-            mealIds: [],
+            mealIds: rowData.meals.map(m => m.id) ?? [],
         },
         validateOnChange: false,
         validateOnBlur: false,
